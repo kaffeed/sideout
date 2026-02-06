@@ -22,10 +22,10 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
        |> push_navigate(to: ~p"/trainer/clubs")}
     else
       is_admin = Clubs.is_club_admin?(user.id, club.id)
-      
+
       members = Clubs.list_members(club.id)
       pending_requests = if is_admin, do: Clubs.list_pending_requests(club.id), else: []
-      
+
       # Load recent sessions for this club
       sessions = Scheduling.list_sessions_for_club(club.id, limit: 10)
 
@@ -162,6 +162,7 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
   defp reload_club(socket) do
     club = Clubs.get_club_with_members(socket.assigns.club.id)
     members = Clubs.list_members(club.id)
+
     pending_requests =
       if socket.assigns.is_admin, do: Clubs.list_pending_requests(club.id), else: []
 
@@ -173,17 +174,27 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
 
   defp role_badge_class(role) when is_binary(role) do
     case role do
-      "admin" -> "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700"
-      "trainer" -> "bg-info-100 text-info-800 dark:bg-info-900/30 dark:text-info-400 border-info-200 dark:border-info-700"
-      _ -> "bg-neutral-100 text-neutral-800 dark:bg-secondary-700 dark:text-neutral-100 border-neutral-200 dark:border-secondary-700"
+      "admin" ->
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700"
+
+      "trainer" ->
+        "bg-info-100 text-info-800 dark:bg-info-900/30 dark:text-info-400 border-info-200 dark:border-info-700"
+
+      _ ->
+        "bg-neutral-100 text-neutral-800 dark:bg-secondary-700 dark:text-neutral-100 border-neutral-200 dark:border-secondary-700"
     end
   end
 
   defp role_badge_class(role) when is_atom(role) do
     case role do
-      :admin -> "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700"
-      :trainer -> "bg-info-100 text-info-800 dark:bg-info-900/30 dark:text-info-400 border-info-200 dark:border-info-700"
-      _ -> "bg-neutral-100 text-neutral-800 dark:bg-secondary-700 dark:text-neutral-100 border-neutral-200 dark:border-secondary-700"
+      :admin ->
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-700"
+
+      :trainer ->
+        "bg-info-100 text-info-800 dark:bg-info-900/30 dark:text-info-400 border-info-200 dark:border-info-700"
+
+      _ ->
+        "bg-neutral-100 text-neutral-800 dark:bg-secondary-700 dark:text-neutral-100 border-neutral-200 dark:border-secondary-700"
     end
   end
 
@@ -220,24 +231,24 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
             Back to Clubs
           </.link>
         </div>
-
-        <!-- Club Header -->
+        
+    <!-- Club Header -->
         <div class="mb-8 overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500">
           <div class="px-6 py-5">
             <div class="flex items-start justify-between">
               <div class="flex-1">
                 <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                  <%= @club.name %>
+                  {@club.name}
                 </h1>
                 <%= if @club.description do %>
                   <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-                    <%= @club.description %>
+                    {@club.description}
                   </p>
                 <% end %>
               </div>
             </div>
-
-            <!-- Action Buttons -->
+            
+    <!-- Action Buttons -->
             <div class="mt-6 flex flex-wrap gap-3">
               <%= if @is_admin do %>
                 <.link
@@ -257,8 +268,8 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
             </div>
           </div>
         </div>
-
-        <!-- Pending Requests (Admin Only) -->
+        
+    <!-- Pending Requests (Admin Only) -->
         <%= if @is_admin and @pending_requests != [] do %>
           <div class="mb-8">
             <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
@@ -271,10 +282,10 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
                     <div class="flex items-center justify-between">
                       <div class="flex-1">
                         <p class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                          <%= request.user.email %>
+                          {request.user.email}
                         </p>
                         <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                          Requested <%= Calendar.strftime(request.inserted_at, "%b %-d, %Y") %>
+                          Requested {Calendar.strftime(request.inserted_at, "%b %-d, %Y")}
                         </p>
                       </div>
                       <div class="flex gap-2">
@@ -300,11 +311,11 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
             </div>
           </div>
         <% end %>
-
-        <!-- Members -->
+        
+    <!-- Members -->
         <div class="mb-8">
           <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-            Members (<%= length(@members) %>)
+            Members ({length(@members)})
           </h2>
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500">
             <ul role="list" class="divide-y divide-neutral-200 dark:divide-secondary-700">
@@ -314,14 +325,14 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
                     <div class="flex items-center gap-3 flex-1">
                       <div class="flex-1">
                         <p class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                          <%= member.user.email %>
+                          {member.user.email}
                         </p>
                       </div>
                       <span class={[
                         "inline-flex rounded-full border px-2 py-1 text-xs font-semibold",
                         role_badge_class(member.role)
                       ]}>
-                        <%= role_text(member.role) %>
+                        {role_text(member.role)}
                       </span>
                     </div>
                     <%= if @is_admin and member.user_id != @current_user.id do %>
@@ -358,8 +369,8 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
             </ul>
           </div>
         </div>
-
-        <!-- Recent Sessions -->
+        
+    <!-- Recent Sessions -->
         <div>
           <div class="mb-4 flex items-center justify-between">
             <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
@@ -395,16 +406,14 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
                       <div class="flex items-center justify-between">
                         <div>
                           <p class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                            <%= format_date(session.date) %>
+                            {format_date(session.date)}
                           </p>
                           <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                            <%= format_time(session.start_time) %> - <%= format_time(
-                              session.end_time
-                            ) %>
+                            {format_time(session.start_time)} - {format_time(session.end_time)}
                           </p>
                         </div>
                         <div class="text-sm text-neutral-500 dark:text-neutral-400">
-                          <%= Scheduling.get_capacity_status(session).description %>
+                          {Scheduling.get_capacity_status(session).description}
                         </div>
                       </div>
                     </.link>
@@ -420,7 +429,8 @@ defmodule SideoutWeb.Trainer.ClubLive.Show do
     <!-- Leave Club Modal -->
     <%= if @show_leave_modal do %>
       <div class="relative z-50" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-neutral-500 dark:bg-neutral-900 bg-opacity-75 dark:bg-opacity-75 transition-opacity"></div>
+        <div class="fixed inset-0 bg-neutral-500 dark:bg-neutral-900 bg-opacity-75 dark:bg-opacity-75 transition-opacity">
+        </div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
           <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-secondary-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">

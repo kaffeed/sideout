@@ -81,7 +81,9 @@ defmodule SideoutWeb.Trainer.TemplateLive.Index do
         <!-- Header -->
         <div class="sm:flex sm:items-center sm:justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">Session Templates</h1>
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+              Session Templates
+            </h1>
             <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
               Create templates for recurring sessions to quickly schedule new training sessions.
             </p>
@@ -95,8 +97,8 @@ defmodule SideoutWeb.Trainer.TemplateLive.Index do
             </.link>
           </div>
         </div>
-
-        <!-- Templates List -->
+        
+    <!-- Templates List -->
         <div class="mt-8">
           <%= if @templates == [] do %>
             <div class="text-center">
@@ -113,7 +115,9 @@ defmodule SideoutWeb.Trainer.TemplateLive.Index do
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">No templates</h3>
+              <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                No templates
+              </h3>
               <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
                 Get started by creating a new session template.
               </p>
@@ -137,16 +141,28 @@ defmodule SideoutWeb.Trainer.TemplateLive.Index do
                     >
                       Name
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Day & Time
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Skill Level
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Capacity
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Status
                     </th>
                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -158,19 +174,17 @@ defmodule SideoutWeb.Trainer.TemplateLive.Index do
                   <%= for template <- @templates do %>
                     <tr>
                       <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:pl-6">
-                        <%= template.name %>
+                        {template.name}
                       </td>
                       <td class="whitespace-nowrap px-3 py-4 text-sm text-neutral-600 dark:text-neutral-400">
-                        <%= format_day(template.day_of_week) %><br />
-                        <%= format_time(template.start_time) %> - <%= format_time(
-                          template.end_time
-                        ) %>
+                        {format_day(template.day_of_week)}<br />
+                        {format_time(template.start_time)} - {format_time(template.end_time)}
                       </td>
                       <td class="whitespace-nowrap px-3 py-4 text-sm text-neutral-600 dark:text-neutral-400">
-                        <%= format_skill_level(template.skill_level) %>
+                        {format_skill_level(template.skill_level)}
                       </td>
                       <td class="whitespace-nowrap px-3 py-4 text-sm text-neutral-600 dark:text-neutral-400">
-                        <%= template.capacity_constraints %>
+                        {template.capacity_constraints}
                       </td>
                       <td class="whitespace-nowrap px-3 py-4 text-sm">
                         <%= if template.active do %>
@@ -203,7 +217,7 @@ defmodule SideoutWeb.Trainer.TemplateLive.Index do
                             phx-value-id={template.id}
                             class="text-warning-600 hover:text-warning-500 dark:text-warning-400 dark:hover:text-warning-300 transition-colors"
                           >
-                            <%= if template.active, do: "Deactivate", else: "Activate" %>
+                            {if template.active, do: "Deactivate", else: "Activate"}
                           </button>
                           <.link
                             phx-click="delete"

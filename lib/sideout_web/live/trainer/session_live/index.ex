@@ -54,8 +54,8 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
   def handle_event("prev_month", _params, socket) do
     current_date = socket.assigns.current_date
     new_date = Date.add(current_date, -30)
-    
-    {:noreply, 
+
+    {:noreply,
      socket
      |> assign(:current_date, new_date)
      |> load_sessions()}
@@ -64,7 +64,7 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
   def handle_event("next_month", _params, socket) do
     current_date = socket.assigns.current_date
     new_date = Date.add(current_date, 30)
-    
+
     {:noreply,
      socket
      |> assign(:current_date, new_date)
@@ -72,11 +72,12 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
   end
 
   def handle_event("filter_by_club", %{"club_id" => club_id}, socket) do
-    selected_club_id = case club_id do
-      "" -> nil
-      id -> String.to_integer(id)
-    end
-    
+    selected_club_id =
+      case club_id do
+        "" -> nil
+        id -> String.to_integer(id)
+      end
+
     {:noreply,
      socket
      |> assign(:selected_club_id, selected_club_id)
@@ -102,48 +103,50 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
   defp assign_defaults(socket) do
     today = Date.utc_today()
     user = socket.assigns.current_user
-    
+
     # Load user's clubs
     user_clubs = Clubs.list_clubs_for_user(user.id)
-    
+
     socket
     |> assign(:current_date, today)
     |> assign(:sessions_by_date, %{})
     |> assign(:user_clubs, user_clubs)
-    |> assign(:selected_club_id, nil)  # nil means show all clubs
+    # nil means show all clubs
+    |> assign(:selected_club_id, nil)
   end
 
   defp load_sessions(socket) do
     user = socket.assigns.current_user
     current_date = socket.assigns.current_date
     selected_club_id = socket.assigns.selected_club_id
-    
+
     # Get first and last day of the month
     first_day = Date.beginning_of_month(current_date)
     last_day = Date.end_of_month(current_date)
-    
+
     # Load sessions for user (including co-trainer sessions)
-    sessions = 
+    sessions =
       Scheduling.list_sessions_for_user(user.id)
       |> Sideout.Repo.preload([:registrations, :club])
       |> Enum.filter(fn session ->
         Date.compare(session.date, first_day) != :lt and
-        Date.compare(session.date, last_day) != :gt
+          Date.compare(session.date, last_day) != :gt
       end)
-    
+
     # Apply club filter if selected
-    sessions = if selected_club_id do
-      Enum.filter(sessions, &(&1.club_id == selected_club_id))
-    else
-      sessions
-    end
-    
+    sessions =
+      if selected_club_id do
+        Enum.filter(sessions, &(&1.club_id == selected_club_id))
+      else
+        sessions
+      end
+
     # Group sessions by date
     sessions_by_date = Enum.group_by(sessions, & &1.date)
-    
+
     # Build calendar data
     calendar_data = build_calendar_data(current_date, sessions_by_date)
-    
+
     socket
     |> assign(:sessions_by_date, sessions_by_date)
     |> assign(:calendar_weeks, calendar_data)
@@ -152,35 +155,37 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
 
   defp build_calendar_data(date, sessions_by_date) do
     first_day = Date.beginning_of_month(date)
-    
+
     # Get the day of week for the first day (1 = Monday, 7 = Sunday)
     first_weekday = Date.day_of_week(first_day)
-    
+
     # Calculate padding days at start (days from previous month)
     padding_start = first_weekday - 1
-    
+
     # Calculate total days to show (6 weeks = 42 days)
     total_days = 42
-    
+
     # Build list of all dates to display
     start_date = Date.add(first_day, -padding_start)
-    
-    dates = Enum.map(0..(total_days - 1), fn offset ->
-      current_date = Date.add(start_date, offset)
-      
-      %{
-        date: current_date,
-        in_month: current_date.month == date.month,
-        is_today: current_date == Date.utc_today(),
-        sessions: Map.get(sessions_by_date, current_date, [])
-      }
-    end)
-    
+
+    dates =
+      Enum.map(0..(total_days - 1), fn offset ->
+        current_date = Date.add(start_date, offset)
+
+        %{
+          date: current_date,
+          in_month: current_date.month == date.month,
+          is_today: current_date == Date.utc_today(),
+          sessions: Map.get(sessions_by_date, current_date, [])
+        }
+      end)
+
     # Group into weeks (7 days each)
     Enum.chunk_every(dates, 7)
   end
 
   defp parse_date(nil), do: Date.utc_today()
+
   defp parse_date(date_string) do
     case Date.from_iso8601(date_string) do
       {:ok, date} -> date
@@ -201,9 +206,14 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
     confirmed = capacity_status.confirmed
 
     cond do
-      confirmed >= 15 -> "bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-400 border-success-200 dark:border-success-700"
-      confirmed >= 10 -> "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400 border-warning-200 dark:border-warning-700"
-      true -> "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400 border-danger-200 dark:border-danger-700"
+      confirmed >= 15 ->
+        "bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-400 border-success-200 dark:border-success-700"
+
+      confirmed >= 10 ->
+        "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400 border-warning-200 dark:border-warning-700"
+
+      true ->
+        "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400 border-danger-200 dark:border-danger-700"
     end
   end
 
@@ -227,8 +237,8 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
             Create Session
           </.link>
         </div>
-
-        <!-- Calendar Navigation -->
+        
+    <!-- Calendar Navigation -->
         <div class="mb-6 rounded-lg bg-white dark:bg-secondary-800 px-4 py-3 shadow-sporty">
           <div class="flex items-center justify-between gap-4">
             <button
@@ -236,16 +246,28 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
               class="inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-secondary-700 transition-colors"
             >
               <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               Previous
             </button>
 
-            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"><%= @month_name %></h2>
-
-            <!-- Club Filter -->
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+              {@month_name}
+            </h2>
+            
+    <!-- Club Filter -->
             <div class="flex items-center gap-2">
-              <label for="club-filter" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Club:</label>
+              <label
+                for="club-filter"
+                class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+              >
+                Club:
+              </label>
               <select
                 id="club-filter"
                 phx-change="filter_by_club"
@@ -254,8 +276,11 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
               >
                 <option value="">All Clubs</option>
                 <%= for membership <- @user_clubs do %>
-                  <option value={membership.club.id} selected={@selected_club_id == membership.club.id}>
-                    <%= membership.club.name %>
+                  <option
+                    value={membership.club.id}
+                    selected={@selected_club_id == membership.club.id}
+                  >
+                    {membership.club.name}
                   </option>
                 <% end %>
               </select>
@@ -267,13 +292,18 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
             >
               Next
               <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
         </div>
-
-        <!-- Calendar Grid -->
+        
+    <!-- Calendar Grid -->
         <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty">
           <!-- Day Headers -->
           <div class="grid grid-cols-7 border-b border-neutral-200 dark:border-secondary-700 bg-neutral-50 dark:bg-secondary-900 text-center text-xs font-semibold leading-6 text-neutral-700 dark:text-neutral-300">
@@ -285,8 +315,8 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
             <div class="py-2">Sat</div>
             <div class="py-2">Sun</div>
           </div>
-
-          <!-- Calendar Body -->
+          
+    <!-- Calendar Body -->
           <div class="grid grid-cols-7 bg-white dark:bg-secondary-800 text-xs leading-6 text-neutral-700 dark:text-neutral-300">
             <%= for week <- @calendar_weeks do %>
               <%= for day <- week do %>
@@ -300,13 +330,17 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
                     patch={~p"/trainer/sessions/new?date=#{Date.to_iso8601(day.date)}"}
                     class={[
                       "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold hover:bg-neutral-200 dark:hover:bg-secondary-600",
-                      if(day.is_today, do: "bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600", else: "text-neutral-900 dark:text-neutral-100")
+                      if(day.is_today,
+                        do:
+                          "bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600",
+                        else: "text-neutral-900 dark:text-neutral-100"
+                      )
                     ]}
                   >
-                    <%= day.date.day %>
+                    {day.date.day}
                   </.link>
-
-                  <!-- Sessions for this day -->
+                  
+    <!-- Sessions for this day -->
                   <div class="mt-1 space-y-1">
                     <%= for session <- Enum.take(day.sessions, 3) do %>
                       <.link
@@ -317,22 +351,22 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
                         ]}
                       >
                         <div class="font-semibold">
-                          <%= format_time(session.start_time) %>
+                          {format_time(session.start_time)}
                         </div>
                         <%= if session.club do %>
                           <div class="text-xs font-medium truncate">
-                            <%= session.club.name %>
+                            {session.club.name}
                           </div>
                         <% end %>
                         <div class="text-xs">
-                          <%= count_registrations(session, :confirmed) %> players
+                          {count_registrations(session, :confirmed)} players
                         </div>
                       </.link>
                     <% end %>
 
                     <%= if length(day.sessions) > 3 do %>
                       <div class="px-1.5 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                        +<%= length(day.sessions) - 3 %> more
+                        +{length(day.sessions) - 3} more
                       </div>
                     <% end %>
                   </div>

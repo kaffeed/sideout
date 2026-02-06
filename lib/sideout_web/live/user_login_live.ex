@@ -8,7 +8,10 @@ defmodule SideoutWeb.UserLoginLive do
         Log in to account
         <:subtitle>
           Don't have an account?
-          <.link navigate={~p"/users/register"} class="font-semibold text-primary-600 dark:text-primary-400 hover:underline">
+          <.link
+            navigate={~p"/users/register"}
+            class="font-semibold text-primary-600 dark:text-primary-400 hover:underline"
+          >
             Sign up
           </.link>
           for an account now.

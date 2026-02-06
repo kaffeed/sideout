@@ -61,7 +61,8 @@ defmodule Sideout.MixProject do
       {:bandit, "~> 1.2"},
       {:nanoid, "~> 2.1"},
       {:eqrcode, "~> 0.1.10"},
-      {:hammer, "~> 6.2"}
+      {:hammer, "~> 6.2"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 

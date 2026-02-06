@@ -70,7 +70,7 @@ defmodule SideoutWeb.Trainer.ClubLive.Index do
 
     # Filter out clubs the user is already a member of or has pending request
     user_club_ids = Enum.map(user_clubs, & &1.club_id)
-    
+
     available_clubs =
       all_clubs
       |> Enum.reject(fn club -> club.id in user_club_ids end)
@@ -86,33 +86,53 @@ defmodule SideoutWeb.Trainer.ClubLive.Index do
 
   defp membership_status_badge(status) when is_binary(status) do
     case status do
-      "pending" -> "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400 border-warning-200"
-      "rejected" -> "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400 border-danger-200"
-      _ -> "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
+      "pending" ->
+        "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400 border-warning-200"
+
+      "rejected" ->
+        "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400 border-danger-200"
+
+      _ ->
+        "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
     end
   end
 
   defp membership_status_badge(status) when is_atom(status) do
     case status do
-      :pending -> "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400 border-warning-200"
-      :rejected -> "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400 border-danger-200"
-      _ -> "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
+      :pending ->
+        "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400 border-warning-200"
+
+      :rejected ->
+        "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400 border-danger-200"
+
+      _ ->
+        "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
     end
   end
 
   defp role_badge_class(role) when is_binary(role) do
     case role do
-      "admin" -> "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700"
-      "trainer" -> "bg-info-100 dark:bg-info-900/30 text-info-600 dark:text-info-400 border-info-200 dark:border-info-700"
-      _ -> "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
+      "admin" ->
+        "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700"
+
+      "trainer" ->
+        "bg-info-100 dark:bg-info-900/30 text-info-600 dark:text-info-400 border-info-200 dark:border-info-700"
+
+      _ ->
+        "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
     end
   end
 
   defp role_badge_class(role) when is_atom(role) do
     case role do
-      :admin -> "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700"
-      :trainer -> "bg-info-100 dark:bg-info-900/30 text-info-600 dark:text-info-400 border-info-200 dark:border-info-700"
-      _ -> "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
+      :admin ->
+        "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700"
+
+      :trainer ->
+        "bg-info-100 dark:bg-info-900/30 text-info-600 dark:text-info-400 border-info-200 dark:border-info-700"
+
+      _ ->
+        "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100 border-neutral-200 dark:border-secondary-600"
     end
   end
 
@@ -139,8 +159,8 @@ defmodule SideoutWeb.Trainer.ClubLive.Index do
             Create Club
           </.link>
         </div>
-
-        <!-- My Clubs -->
+        
+    <!-- My Clubs -->
         <div class="mb-8">
           <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">My Clubs</h2>
 
@@ -163,18 +183,18 @@ defmodule SideoutWeb.Trainer.ClubLive.Index do
                   <div class="p-6">
                     <div class="flex items-start justify-between">
                       <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                        <%= membership.club.name %>
+                        {membership.club.name}
                       </h3>
                       <span class={[
                         "inline-flex rounded-full border px-2 py-1 text-xs font-semibold",
                         role_badge_class(membership.role)
                       ]}>
-                        <%= role_text(membership.role) %>
+                        {role_text(membership.role)}
                       </span>
                     </div>
                     <%= if membership.club.description do %>
                       <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-                        <%= membership.club.description %>
+                        {membership.club.description}
                       </p>
                     <% end %>
                   </div>
@@ -183,8 +203,8 @@ defmodule SideoutWeb.Trainer.ClubLive.Index do
             </div>
           <% end %>
         </div>
-
-        <!-- Available Clubs -->
+        
+    <!-- Available Clubs -->
         <div>
           <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
             Browse Clubs
@@ -202,11 +222,11 @@ defmodule SideoutWeb.Trainer.ClubLive.Index do
                 <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500">
                   <div class="p-6">
                     <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                      <%= club.name %>
+                      {club.name}
                     </h3>
                     <%= if club.description do %>
                       <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400 line-clamp-3">
-                        <%= club.description %>
+                        {club.description}
                       </p>
                     <% end %>
                     <div class="mt-4">

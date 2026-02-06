@@ -6,7 +6,10 @@ defmodule Sideout.Scheduling.Session do
   alias Sideout.Scheduling.{SessionTemplate, Registration, ConstraintResolver}
 
   schema "sessions" do
-    field :status, Ecto.Enum, values: [:scheduled, :in_progress, :completed, :cancelled], default: :scheduled
+    field :status, Ecto.Enum,
+      values: [:scheduled, :in_progress, :completed, :cancelled],
+      default: :scheduled
+
     field :date, :date
     field :start_time, :time
     field :end_time, :time
@@ -38,7 +41,20 @@ defmodule Sideout.Scheduling.Session do
   @doc false
   def changeset(session, attrs) do
     session
-    |> cast(attrs, [:date, :start_time, :end_time, :fields_available, :capacity_constraints, :cancellation_deadline_hours, :notes, :status, :session_template_id, :user_id, :share_token, :club_id])
+    |> cast(attrs, [
+      :date,
+      :start_time,
+      :end_time,
+      :fields_available,
+      :capacity_constraints,
+      :cancellation_deadline_hours,
+      :notes,
+      :status,
+      :session_template_id,
+      :user_id,
+      :share_token,
+      :club_id
+    ])
     |> validate_required([:date, :start_time, :end_time, :capacity_constraints, :club_id])
     |> validate_number(:fields_available, greater_than: 0)
     |> validate_number(:cancellation_deadline_hours, greater_than_or_equal_to: 0)
@@ -62,12 +78,14 @@ defmodule Sideout.Scheduling.Session do
   defp validate_future_date(changeset) do
     # Skip validation for completed or cancelled sessions
     status = get_field(changeset, :status)
-    
+
     if status in [:completed, :cancelled] do
       changeset
     else
       case get_change(changeset, :date) do
-        nil -> changeset
+        nil ->
+          changeset
+
         date ->
           if Date.compare(date, Date.utc_today()) == :lt do
             add_error(changeset, :date, "must be today or in the future")
@@ -80,9 +98,13 @@ defmodule Sideout.Scheduling.Session do
 
   defp validate_constraint_format(changeset) do
     case get_change(changeset, :capacity_constraints) do
-      nil -> changeset
-      "" -> add_error(changeset, :capacity_constraints, "cannot be empty")
-      constraints -> 
+      nil ->
+        changeset
+
+      "" ->
+        add_error(changeset, :capacity_constraints, "cannot be empty")
+
+      constraints ->
         if String.match?(constraints, ~r/^[a-z_0-9]+(,[a-z_0-9]+)*$/) do
           changeset
         else
@@ -102,10 +124,12 @@ defmodule Sideout.Scheduling.Session do
 
   """
   def with_parsed_constraints(%__MODULE__{} = session) do
-    constraints = ConstraintResolver.parse_constraints(
-      session.capacity_constraints,
-      session.fields_available
-    )
+    constraints =
+      ConstraintResolver.parse_constraints(
+        session.capacity_constraints,
+        session.fields_available
+      )
+
     %{session | constraint_list: constraints}
   end
 
@@ -133,10 +157,12 @@ defmodule Sideout.Scheduling.Session do
 
   def with_capacity_spec(%__MODULE__{} = session) do
     # Parse from string and compose with AND
-    spec = ConstraintResolver.parse_to_specification(
-      session.capacity_constraints,
-      session.fields_available
-    )
+    spec =
+      ConstraintResolver.parse_to_specification(
+        session.capacity_constraints,
+        session.fields_available
+      )
+
     %{session | capacity_spec: spec}
   end
 end

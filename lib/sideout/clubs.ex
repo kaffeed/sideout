@@ -61,7 +61,8 @@ defmodule Sideout.Clubs do
         add_trainer_to_club(user_id, club.id, role: "admin", status: "active")
         {:ok, club}
 
-      error -> error
+      error ->
+        error
     end
   end
 
@@ -111,7 +112,7 @@ defmodule Sideout.Clubs do
   """
   def approve_membership(membership_id, admin_user_id) do
     membership = Repo.get!(ClubMembership, membership_id)
-    
+
     # Check if the user is an admin of the club
     unless is_club_admin?(admin_user_id, membership.club_id) do
       {:error, :unauthorized}
@@ -131,7 +132,7 @@ defmodule Sideout.Clubs do
   """
   def reject_membership(membership_id, admin_user_id) do
     membership = Repo.get!(ClubMembership, membership_id)
-    
+
     # Check if the user is an admin of the club
     unless is_club_admin?(admin_user_id, membership.club_id) do
       {:error, :unauthorized}
@@ -185,7 +186,9 @@ defmodule Sideout.Clubs do
     )
     |> Repo.one()
     |> case do
-      nil -> {:error, :not_found}
+      nil ->
+        {:error, :not_found}
+
       membership ->
         membership
         |> ClubMembership.changeset(%{role: "admin"})
@@ -202,7 +205,9 @@ defmodule Sideout.Clubs do
     )
     |> Repo.one()
     |> case do
-      nil -> {:error, :not_found}
+      nil ->
+        {:error, :not_found}
+
       membership ->
         membership
         |> ClubMembership.changeset(%{role: "trainer"})
@@ -252,8 +257,9 @@ defmodule Sideout.Clubs do
   """
   def is_club_admin?(user_id, club_id) do
     from(m in ClubMembership,
-      where: m.user_id == ^user_id and m.club_id == ^club_id and
-             m.status == "active" and m.role == "admin"
+      where:
+        m.user_id == ^user_id and m.club_id == ^club_id and
+          m.status == "active" and m.role == "admin"
     )
     |> Repo.exists?()
   end
@@ -263,8 +269,9 @@ defmodule Sideout.Clubs do
   """
   def is_club_member?(user_id, club_id) do
     from(m in ClubMembership,
-      where: m.user_id == ^user_id and m.club_id == ^club_id and
-             m.status == "active"
+      where:
+        m.user_id == ^user_id and m.club_id == ^club_id and
+          m.status == "active"
     )
     |> Repo.exists?()
   end

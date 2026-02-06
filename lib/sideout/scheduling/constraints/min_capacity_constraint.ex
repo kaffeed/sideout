@@ -1,9 +1,9 @@
 defmodule Sideout.Scheduling.Constraints.MinCapacityConstraint do
   @moduledoc """
   Constraint that enforces a minimum capacity for a session.
-  
+
   This constraint checks if the session has at least the minimum number of players.
-  
+
   Note: When checking if a player can be added, this constraint always returns true
   for the hypothetical state (count + 1), since adding more players is always
   moving toward satisfying the minimum.
@@ -20,7 +20,7 @@ defmodule Sideout.Scheduling.Constraints.MinCapacityConstraint do
       "min_12"
 
   ## Pattern Reference
-  
+
   Atomic specification from the pure Specification pattern:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

@@ -8,7 +8,7 @@ defmodule SideoutWeb.Trainer.PlayerLive.FormComponent do
     ~H"""
     <div>
       <.header>
-        <%= @title %>
+        {@title}
         <:subtitle>
           <%= if @action == :new do %>
             Add a new player to the system.
@@ -27,19 +27,9 @@ defmodule SideoutWeb.Trainer.PlayerLive.FormComponent do
       >
         <.input field={@form[:name]} type="text" label="Name" required />
 
-        <.input
-          field={@form[:email]}
-          type="email"
-          label="Email"
-          placeholder="player@example.com"
-        />
+        <.input field={@form[:email]} type="email" label="Email" placeholder="player@example.com" />
 
-        <.input
-          field={@form[:phone]}
-          type="text"
-          label="Phone"
-          placeholder="+1 (555) 123-4567"
-        />
+        <.input field={@form[:phone]} type="text" label="Phone" placeholder="+1 (555) 123-4567" />
 
         <.input
           field={@form[:notes]}

@@ -6,7 +6,11 @@ defmodule Sideout.Scheduling.Registration do
 
   schema "registrations" do
     field :position, :integer
-    field :status, Ecto.Enum, values: [:confirmed, :waitlisted, :cancelled, :attended, :no_show], default: :confirmed
+
+    field :status, Ecto.Enum,
+      values: [:confirmed, :waitlisted, :cancelled, :attended, :no_show],
+      default: :confirmed
+
     field :priority_score, :decimal
     field :registered_at, :utc_datetime
     field :cancelled_at, :utc_datetime
@@ -23,13 +27,26 @@ defmodule Sideout.Scheduling.Registration do
   @doc false
   def changeset(registration, attrs) do
     registration
-    |> cast(attrs, [:status, :priority_score, :position, :registered_at, :cancelled_at, :cancellation_reason, :cancellation_token, :session_id, :player_id, :is_trainer])
+    |> cast(attrs, [
+      :status,
+      :priority_score,
+      :position,
+      :registered_at,
+      :cancelled_at,
+      :cancellation_reason,
+      :cancellation_token,
+      :session_id,
+      :player_id,
+      :is_trainer
+    ])
     |> validate_required([:session_id, :player_id])
     |> validate_number(:priority_score, greater_than_or_equal_to: 0)
     |> validate_number(:position, greater_than: 0)
     |> foreign_key_constraint(:session_id)
     |> foreign_key_constraint(:player_id)
-    |> unique_constraint([:session_id, :player_id], name: :registrations_session_id_player_id_index)
+    |> unique_constraint([:session_id, :player_id],
+      name: :registrations_session_id_player_id_index
+    )
     |> unique_constraint(:cancellation_token)
   end
 

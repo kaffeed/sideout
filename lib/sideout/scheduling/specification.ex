@@ -1,34 +1,34 @@
 defprotocol Sideout.Scheduling.Specification do
   @moduledoc """
   Pure Specification pattern implementation as described in the Wikipedia article.
-  
+
   The Specification pattern allows business rules to be recombined by chaining
   them together using Boolean logic (AND, OR, NOT). This protocol defines the
   interface that all specifications must implement.
-  
+
   ## Pattern Overview
-  
+
   The Specification pattern consists of:
-  
+
   - **Specification**: The interface/protocol (this module)
   - **CompositeSpecification**: Helper module providing default composition implementations
   - **Atomic Specifications**: Individual constraints (MaxCapacity, MinCapacity, etc.)
   - **Composite Specifications**: Boolean combinations (AND, OR, NOT, etc.)
-  
+
   ## Session State
-  
+
   Specifications are evaluated against a session state map:
-  
+
       %{
         confirmed_count: integer,   # Number of confirmed players
         waitlist_count: integer,    # Number of waitlisted players
         fields_available: integer   # Number of available fields
       }
-  
+
   ## Usage Examples
-  
+
   ### Basic Composition
-  
+
       max_18 = %MaxCapacityConstraint{value: 18}
       min_12 = %MinCapacityConstraint{value: 12}
       even = %EvenNumberConstraint{}
@@ -46,9 +46,9 @@ defprotocol Sideout.Scheduling.Specification do
       session_state = %{confirmed_count: 14, waitlist_count: 0, fields_available: 1}
       Specification.is_satisfied_by(spec, session_state)
       # => true
-  
+
   ### Complex Boolean Logic
-  
+
       # (max_18 AND even) OR min_12
       complex = 
         max_18
@@ -62,11 +62,11 @@ defprotocol Sideout.Scheduling.Specification do
       inverted = 
         Specification.and_spec(max_18, min_12)
         |> Specification.not_spec()
-  
+
   ## Implementing New Specifications
-  
+
   To create a new specification, implement this protocol:
-  
+
       defmodule MyCustomConstraint do
         @enforce_keys [:value]
         defstruct [:value]
@@ -90,12 +90,12 @@ defprotocol Sideout.Scheduling.Specification do
           def not_spec(spec), do: CompositeSpecification.not_spec(spec)
         end
       end
-  
+
   ## Pattern Reference
-  
+
   Based on the Specification pattern from Domain-Driven Design:
   https://en.wikipedia.org/wiki/Specification_pattern
-  
+
   Key differences from the Wikipedia article (due to Elixir conventions):
   - Method names use snake_case instead of camelCase
   - Protocol dispatch instead of class inheritance
@@ -104,11 +104,11 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Check if the specification is satisfied by the given session state.
-  
+
   Returns `true` if the specification is satisfied, `false` otherwise.
-  
+
   ## Examples
-  
+
       iex> max_18 = %MaxCapacityConstraint{value: 18}
       iex> state = %{confirmed_count: 15, waitlist_count: 0, fields_available: 1}
       iex> Specification.is_satisfied_by(max_18, state)
@@ -123,9 +123,9 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Returns a human-readable description of the specification.
-  
+
   ## Examples
-  
+
       iex> max_18 = %MaxCapacityConstraint{value: 18}
       iex> Specification.description(max_18)
       "Maximum 18 players"
@@ -135,9 +135,9 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Returns the specification identifier/name used in database storage.
-  
+
   ## Examples
-  
+
       iex> max_18 = %MaxCapacityConstraint{value: 18}
       iex> Specification.name(max_18)
       "max_capacity"
@@ -147,11 +147,11 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Creates a specification that is satisfied when BOTH specifications are satisfied.
-  
+
   Returns a new `AndSpecification` that combines the two specifications with AND logic.
-  
+
   ## Examples
-  
+
       iex> max_18 = %MaxCapacityConstraint{value: 18}
       iex> min_12 = %MinCapacityConstraint{value: 12}
       iex> combined = Specification.and_spec(max_18, min_12)
@@ -164,11 +164,11 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Creates a specification that is satisfied when the first is satisfied AND the second is NOT.
-  
+
   Equivalent to: first AND (NOT second)
-  
+
   ## Examples
-  
+
       iex> max_18 = %MaxCapacityConstraint{value: 18}
       iex> even = %EvenNumberConstraint{}
       iex> odd_up_to_18 = Specification.and_not(max_18, even)
@@ -181,11 +181,11 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Creates a specification that is satisfied when EITHER specification is satisfied.
-  
+
   Returns a new `OrSpecification` that combines the two specifications with OR logic.
-  
+
   ## Examples
-  
+
       iex> max_18 = %MaxCapacityConstraint{value: 18}
       iex> min_12 = %MinCapacityConstraint{value: 12}
       iex> combined = Specification.or_spec(max_18, min_12)
@@ -195,11 +195,11 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Creates a specification that is satisfied when the first is satisfied OR the second is NOT.
-  
+
   Equivalent to: first OR (NOT second)
-  
+
   ## Examples
-  
+
       iex> max_18 = %MaxCapacityConstraint{value: 18}
       iex> min_12 = %MinCapacityConstraint{value: 12}
       iex> combined = Specification.or_not(max_18, min_12)
@@ -209,11 +209,11 @@ defprotocol Sideout.Scheduling.Specification do
 
   @doc """
   Creates a specification that inverts the wrapped specification.
-  
+
   Returns a new `NotSpecification` that negates the original specification.
-  
+
   ## Examples
-  
+
       iex> even = %EvenNumberConstraint{}
       iex> odd = Specification.not_spec(even)
       iex> state = %{confirmed_count: 15, waitlist_count: 0, fields_available: 1}

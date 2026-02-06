@@ -59,10 +59,16 @@ defmodule Sideout.Accounts.User do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 12, max: 72)
-    |> validate_format(:password, ~r/[a-z]/, message: "must include at least one lowercase letter")
-    |> validate_format(:password, ~r/[A-Z]/, message: "must include at least one uppercase letter")
+    |> validate_format(:password, ~r/[a-z]/,
+      message: "must include at least one lowercase letter"
+    )
+    |> validate_format(:password, ~r/[A-Z]/,
+      message: "must include at least one uppercase letter"
+    )
     |> validate_format(:password, ~r/[0-9]/, message: "must include at least one digit")
-    |> validate_format(:password, ~r/[!?@#$%^&*_]/, message: "must include at least one special character (!?@#$%^&*_)")
+    |> validate_format(:password, ~r/[!?@#$%^&*_]/,
+      message: "must include at least one special character (!?@#$%^&*_)"
+    )
     |> maybe_hash_password(opts)
   end
 

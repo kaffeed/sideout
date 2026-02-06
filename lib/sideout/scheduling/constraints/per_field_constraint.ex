@@ -1,7 +1,7 @@
 defmodule Sideout.Scheduling.Constraints.PerFieldConstraint do
   @moduledoc """
   Constraint that limits players based on the number of available fields.
-  
+
   Calculates max capacity dynamically: players_per_field * fields_available
 
   Part of the pure Specification pattern implementation.
@@ -16,7 +16,7 @@ defmodule Sideout.Scheduling.Constraints.PerFieldConstraint do
       "per_field_9"
 
   ## Pattern Reference
-  
+
   Atomic specification from the pure Specification pattern:
   https://en.wikipedia.org/wiki/Specification_pattern
   """
@@ -29,7 +29,10 @@ defmodule Sideout.Scheduling.Constraints.PerFieldConstraint do
   defimpl Specification do
     alias Sideout.Scheduling.CompositeSpecification
 
-    def is_satisfied_by(%{players_per_field: ppf}, %{confirmed_count: count, fields_available: fields}) do
+    def is_satisfied_by(%{players_per_field: ppf}, %{
+          confirmed_count: count,
+          fields_available: fields
+        }) do
       count <= ppf * fields
     end
 

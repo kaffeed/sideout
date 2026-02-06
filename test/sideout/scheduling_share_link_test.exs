@@ -6,7 +6,7 @@ defmodule Sideout.SchedulingShareLinkTest do
 
   setup do
     # Create a test user
-    {:ok, user} = 
+    {:ok, user} =
       Accounts.register_user(%{
         email: "test@example.com",
         password: "TestPass123!",
@@ -45,7 +45,7 @@ defmodule Sideout.SchedulingShareLinkTest do
       }
 
       # Create 5 sessions
-      sessions = 
+      sessions =
         for i <- 1..5 do
           attrs = Map.put(base_attrs, :date, Date.utc_today() |> Date.add(i))
           {:ok, session} = Scheduling.create_session(user, attrs)
@@ -63,7 +63,7 @@ defmodule Sideout.SchedulingShareLinkTest do
   describe "get_session_by_share_token/2" do
     test "returns session with valid token", %{user: user} do
       # Create a session
-      {:ok, session} = 
+      {:ok, session} =
         Scheduling.create_session(user, %{
           date: Date.utc_today() |> Date.add(7),
           start_time: ~T[18:00:00],
@@ -99,7 +99,7 @@ defmodule Sideout.SchedulingShareLinkTest do
 
     test "preloads necessary associations", %{user: user} do
       # Create a session with template
-      {:ok, template} = 
+      {:ok, template} =
         Scheduling.create_session_template(user, %{
           name: "Test Template",
           day_of_week: :monday,
@@ -112,11 +112,12 @@ defmodule Sideout.SchedulingShareLinkTest do
           active: true
         })
 
-      {:ok, session} = 
+      {:ok, session} =
         Scheduling.create_session_from_template(template, Date.utc_today() |> Date.add(7))
 
       # Get by share token with preload option
-      found_session = Scheduling.get_session_by_share_token(session.share_token, preload: [:session_template])
+      found_session =
+        Scheduling.get_session_by_share_token(session.share_token, preload: [:session_template])
 
       assert found_session.session_template != nil
       assert found_session.session_template.name == "Test Template"
@@ -125,7 +126,7 @@ defmodule Sideout.SchedulingShareLinkTest do
 
   describe "share_token_valid?/1" do
     test "returns true for upcoming scheduled session", %{user: user} do
-      {:ok, session} = 
+      {:ok, session} =
         Scheduling.create_session(user, %{
           date: Date.utc_today() |> Date.add(7),
           start_time: ~T[18:00:00],
@@ -140,7 +141,7 @@ defmodule Sideout.SchedulingShareLinkTest do
     end
 
     test "returns false for cancelled session", %{user: user} do
-      {:ok, session} = 
+      {:ok, session} =
         Scheduling.create_session(user, %{
           date: Date.utc_today() |> Date.add(7),
           start_time: ~T[18:00:00],
@@ -155,7 +156,7 @@ defmodule Sideout.SchedulingShareLinkTest do
     end
 
     test "returns false for completed session", %{user: user} do
-      {:ok, session} = 
+      {:ok, session} =
         Scheduling.create_session(user, %{
           date: Date.utc_today() |> Date.add(-7),
           start_time: ~T[18:00:00],
@@ -173,9 +174,9 @@ defmodule Sideout.SchedulingShareLinkTest do
       # Note: Can't test past date sessions because schema validation prevents creating them
       # This would need to be tested at a lower level by bypassing changeset validation
       # or by manually updating the database
-      
+
       # Instead, test by getting a session and checking the validation logic
-      {:ok, session} = 
+      {:ok, session} =
         Scheduling.create_session(user, %{
           date: Date.utc_today() |> Date.add(7),
           start_time: ~T[18:00:00],
@@ -188,7 +189,7 @@ defmodule Sideout.SchedulingShareLinkTest do
 
       # Manually set the date to the past to test validation
       past_session = %{session | date: Date.utc_today() |> Date.add(-7)}
-      
+
       assert Scheduling.share_token_valid?(past_session) == false
     end
   end

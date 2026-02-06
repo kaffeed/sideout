@@ -98,22 +98,23 @@ defmodule Sideout.Scheduling do
   """
   def get_or_create_player_by_name(name, attrs \\ %{}) do
     club_id = attrs["club_id"] || Map.get(attrs, :club_id)
-    
+
     # Build query that handles nil club_id properly
-    player = 
+    player =
       if club_id do
         Repo.get_by(Player, name: name, club_id: club_id)
       else
         from(p in Player, where: p.name == ^name and is_nil(p.club_id))
         |> Repo.one()
       end
-    
+
     case player do
       nil ->
-        attrs = 
+        attrs =
           attrs
           |> Map.put("name", name)
           |> (fn a -> if club_id, do: Map.put(a, "club_id", club_id), else: a end).()
+
         create_player(attrs)
 
       player ->
@@ -434,15 +435,18 @@ defmodule Sideout.Scheduling do
   defp maybe_filter_to_date(query, date), do: where(query, [s], s.date <= ^date)
 
   defp maybe_filter_status(query, nil), do: query
+
   defp maybe_filter_status(query, statuses) when is_list(statuses) do
     where(query, [s], s.status in ^statuses)
   end
+
   defp maybe_filter_status(query, status), do: where(query, [s], s.status == ^status)
 
   defp maybe_filter_user_id(query, nil), do: query
   defp maybe_filter_user_id(query, user_id), do: where(query, user_id: ^user_id)
 
   defp maybe_filter_skill_level(query, nil), do: query
+
   defp maybe_filter_skill_level(query, skill_level) do
     query
     |> join(:left, [s], st in assoc(s, :session_template))
@@ -477,7 +481,7 @@ defmodule Sideout.Scheduling do
   Creates a session.
   """
   def create_session(user, attrs \\ %{}) do
-    attrs = 
+    attrs =
       attrs
       |> Map.put("user_id", user.id)
       |> Map.put_new("share_token", generate_unique_share_token())
@@ -577,7 +581,9 @@ defmodule Sideout.Scheduling do
       Session
       |> Repo.get_by(share_token: token)
       |> case do
-        nil -> nil
+        nil ->
+          nil
+
         session ->
           session = Repo.preload(session, preload)
           if share_token_valid?(session), do: session, else: nil
@@ -602,7 +608,7 @@ defmodule Sideout.Scheduling do
   """
   def share_token_valid?(%Session{status: :cancelled}), do: false
   def share_token_valid?(%Session{status: :completed}), do: false
-  
+
   def share_token_valid?(%Session{date: date}) do
     Date.compare(date, Date.utc_today()) != :lt
   end
@@ -764,7 +770,7 @@ defmodule Sideout.Scheduling do
   """
   def register_player(%Session{} = session, %Player{} = player, attrs \\ %{}) do
     require Logger
-    
+
     # Check if player is already registered with active status
     existing_active =
       Registration
@@ -773,7 +779,10 @@ defmodule Sideout.Scheduling do
       |> Repo.one()
 
     if existing_active do
-      Logger.info("register_player: Player #{player.id} already has active registration for session #{session.id}")
+      Logger.info(
+        "register_player: Player #{player.id} already has active registration for session #{session.id}"
+      )
+
       {:error, :already_registered}
     else
       # Check if there's a cancelled registration we can reuse
@@ -784,16 +793,18 @@ defmodule Sideout.Scheduling do
         |> Repo.one()
 
       if existing_cancelled do
-        Logger.info("register_player: Found cancelled registration #{existing_cancelled.id}, will reuse it")
+        Logger.info(
+          "register_player: Found cancelled registration #{existing_cancelled.id}, will reuse it"
+        )
       else
         Logger.info("register_player: No existing registration, will create new one")
       end
 
       # Check if this is a trainer registration
       is_trainer = Map.get(attrs, "is_trainer", false)
-      
+
       # Get capacity status (excluding trainers if this is a trainer registration)
-      capacity_status = 
+      capacity_status =
         if is_trainer do
           # Trainers always get confirmed, don't check capacity
           %{can_add_player: true}
@@ -829,7 +840,10 @@ defmodule Sideout.Scheduling do
       # Create or update registration
       result =
         if existing_cancelled do
-          Logger.info("register_player: Updating cancelled registration #{existing_cancelled.id} to status #{status}")
+          Logger.info(
+            "register_player: Updating cancelled registration #{existing_cancelled.id} to status #{status}"
+          )
+
           # Reuse the cancelled registration
           existing_cancelled
           |> Registration.create_changeset(registration_attrs)
@@ -844,7 +858,10 @@ defmodule Sideout.Scheduling do
 
       case result do
         {:ok, registration} ->
-          Logger.info("register_player: Success! Registration ID: #{registration.id}, Status: #{registration.status}")
+          Logger.info(
+            "register_player: Success! Registration ID: #{registration.id}, Status: #{registration.status}"
+          )
+
           # Broadcast PubSub event
           broadcast_session_update(session.id, :player_registered, %{
             player_id: player.id,
@@ -933,7 +950,10 @@ defmodule Sideout.Scheduling do
 
     # Debug logging
     require Logger
-    Logger.info("Attempting to promote from waitlist. Session #{session.id}, can_add_player: #{capacity_status.can_add_player}, confirmed: #{capacity_status.confirmed}")
+
+    Logger.info(
+      "Attempting to promote from waitlist. Session #{session.id}, can_add_player: #{capacity_status.can_add_player}, confirmed: #{capacity_status.confirmed}"
+    )
 
     # Only promote if we can add a player
     if capacity_status.can_add_player do
@@ -961,6 +981,7 @@ defmodule Sideout.Scheduling do
 
         registration ->
           Logger.info("Promoting player #{registration.player_id}")
+
           result =
             registration
             |> Registration.changeset(%{status: :confirmed})
@@ -1003,7 +1024,7 @@ defmodule Sideout.Scheduling do
   def mark_attendance(%Registration{} = registration, status)
       when status in [:attended, :no_show] do
     registration = Repo.preload(registration, [:player, :session])
-    
+
     result =
       registration
       |> Registration.changeset(%{status: status})
@@ -1013,7 +1034,7 @@ defmodule Sideout.Scheduling do
       {:ok, updated_registration} ->
         # Update player stats
         update_player_stats_after_attendance(updated_registration)
-        
+
         # Broadcast PubSub event
         broadcast_session_update(registration.session_id, :attendance_marked, %{
           registration_id: registration.id,
@@ -1199,7 +1220,7 @@ defmodule Sideout.Scheduling do
 
   @doc """
   Gets the maximum capacity for a session based on its constraints.
-  
+
   Returns the max capacity value from MaxCapacityConstraint if present,
   otherwise returns a default value of 999 (unlimited).
 
@@ -1217,14 +1238,16 @@ defmodule Sideout.Scheduling do
       )
 
     # Find MaxCapacityConstraint and extract its value
-    max_constraint = Enum.find(constraints, fn
-      %Sideout.Scheduling.Constraints.MaxCapacityConstraint{} -> true
-      _ -> false
-    end)
+    max_constraint =
+      Enum.find(constraints, fn
+        %Sideout.Scheduling.Constraints.MaxCapacityConstraint{} -> true
+        _ -> false
+      end)
 
     case max_constraint do
       %{value: max} -> max
-      _ -> 999  # Default unlimited capacity
+      # Default unlimited capacity
+      _ -> 999
     end
   end
 
@@ -1260,7 +1283,7 @@ defmodule Sideout.Scheduling do
 
   @doc """
   Adds a co-trainer to a session.
-  
+
   The trainer must be a member of the session's club.
   """
   def add_cotrainer(session, trainer_user_id, added_by_user_id) do
@@ -1303,7 +1326,7 @@ defmodule Sideout.Scheduling do
 
   @doc """
   Invites a guest club to a session.
-  
+
   Cannot invite the primary club as a guest.
   """
   def invite_guest_club(session, club_id, invited_by_user_id) do
@@ -1335,11 +1358,12 @@ defmodule Sideout.Scheduling do
   Lists all guest clubs for a session.
   """
   def list_guest_clubs(session_or_id) do
-    session = case session_or_id do
-      %Session{} = s -> s
-      id when is_integer(id) -> get_session!(id)
-    end
-    
+    session =
+      case session_or_id do
+        %Session{} = s -> s
+        id when is_integer(id) -> get_session!(id)
+      end
+
     session
     |> Repo.preload(:invited_clubs)
     |> Map.get(:invited_clubs)
@@ -1351,25 +1375,29 @@ defmodule Sideout.Scheduling do
 
   @doc """
   Registers a trainer as a participant in a session.
-  
+
   Trainer registrations don't count toward capacity constraints.
   """
   def register_trainer_participation(session, user_id) do
     # Get or create player record for trainer
     trainer = Accounts.get_user!(user_id)
-    
-    player = 
+
+    player =
       case Repo.get_by(Player, name: trainer.email, club_id: session.club_id) do
-        nil -> 
-          {:ok, p} = create_player(%{
-            "name" => trainer.email,
-            "email" => trainer.email,
-            "club_id" => session.club_id
-          })
+        nil ->
+          {:ok, p} =
+            create_player(%{
+              "name" => trainer.email,
+              "email" => trainer.email,
+              "club_id" => session.club_id
+            })
+
           p
-        existing -> existing
+
+        existing ->
+          existing
       end
-    
+
     # Register with is_trainer flag set to true
     register_player(session, player, %{"is_trainer" => true})
   end
@@ -1379,12 +1407,14 @@ defmodule Sideout.Scheduling do
   """
   def unregister_trainer_participation(session, user_id) do
     trainer = Accounts.get_user!(user_id)
-    
+
     from(r in Registration,
-      join: p in Player, on: r.player_id == p.id,
-      where: r.session_id == ^session.id and 
-             p.name == ^trainer.email and
-             r.is_trainer == true
+      join: p in Player,
+      on: r.player_id == p.id,
+      where:
+        r.session_id == ^session.id and
+          p.name == ^trainer.email and
+          r.is_trainer == true
     )
     |> Repo.one()
     |> case do
@@ -1408,7 +1438,7 @@ defmodule Sideout.Scheduling do
 
   @doc """
   Removes a participant from a session.
-  
+
   This cancels their registration with a reason.
   """
   def remove_participant(registration_id, _manager_user_id) do
@@ -1421,7 +1451,7 @@ defmodule Sideout.Scheduling do
   """
   def demote_to_waitlist(registration_id, _manager_user_id) do
     registration = Repo.get!(Registration, registration_id) |> Repo.preload(:session)
-    
+
     if registration.status == :confirmed do
       registration
       |> Registration.changeset(%{status: :waitlisted})
@@ -1433,8 +1463,11 @@ defmodule Sideout.Scheduling do
             registration_id: updated.id,
             player_id: updated.player_id
           })
+
           {:ok, updated}
-        error -> error
+
+        error ->
+          error
       end
     else
       {:error, :not_confirmed}
@@ -1445,21 +1478,22 @@ defmodule Sideout.Scheduling do
 
   @doc """
   Lists all sessions for a user across all their clubs.
-  
+
   Includes sessions where the user is the creator or a co-trainer.
   """
   def list_sessions_for_user(user_id) do
     # Get all clubs user belongs to
-    club_ids = 
+    club_ids =
       from(m in Sideout.Clubs.ClubMembership,
         where: m.user_id == ^user_id and m.status == "active",
         select: m.club_id
       )
       |> Repo.all()
-    
+
     # Get sessions from user's clubs + sessions where user is co-trainer
     from(s in Session,
-      left_join: sc in SessionCotrainer, on: sc.session_id == s.id,
+      left_join: sc in SessionCotrainer,
+      on: sc.session_id == s.id,
       where: s.club_id in ^club_ids or sc.user_id == ^user_id,
       distinct: true,
       order_by: [asc: s.date, asc: s.start_time]
@@ -1472,28 +1506,30 @@ defmodule Sideout.Scheduling do
   """
   def list_sessions_for_club(club_id, opts \\ []) do
     status = Keyword.get(opts, :status)
-    
-    query = from(s in Session,
-      where: s.club_id == ^club_id,
-      order_by: [asc: s.date, asc: s.start_time]
-    )
-    
-    query = if status do
-      where(query, [s], s.status == ^status)
-    else
-      query
-    end
-    
+
+    query =
+      from(s in Session,
+        where: s.club_id == ^club_id,
+        order_by: [asc: s.date, asc: s.start_time]
+      )
+
+    query =
+      if status do
+        where(query, [s], s.status == ^status)
+      else
+        query
+      end
+
     Repo.all(query)
   end
 
   @doc """
   Checks if a user can manage a session.
-  
+
   Returns true if the user is the creator or a co-trainer.
   """
   def can_manage_session?(session, user_id) do
-    session.user_id == user_id or 
+    session.user_id == user_id or
       from(sc in SessionCotrainer,
         where: sc.session_id == ^session.id and sc.user_id == ^user_id
       )
@@ -1504,7 +1540,7 @@ defmodule Sideout.Scheduling do
 
   @doc """
   Gets capacity status for a session, excluding trainer registrations.
-  
+
   This is an updated version that filters out is_trainer=true registrations
   from capacity calculations.
   """
@@ -1516,19 +1552,21 @@ defmodule Sideout.Scheduling do
       )
 
     # Count only non-trainer registrations
-    confirmed_count = 
+    confirmed_count =
       from(r in Registration,
-        where: r.session_id == ^session.id and 
-               r.status == :confirmed and
-               r.is_trainer == false
+        where:
+          r.session_id == ^session.id and
+            r.status == :confirmed and
+            r.is_trainer == false
       )
       |> Repo.aggregate(:count)
-    
+
     waitlist_count =
       from(r in Registration,
-        where: r.session_id == ^session.id and 
-               r.status == :waitlisted and
-               r.is_trainer == false
+        where:
+          r.session_id == ^session.id and
+            r.status == :waitlisted and
+            r.is_trainer == false
       )
       |> Repo.aggregate(:count)
 

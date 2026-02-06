@@ -37,7 +37,10 @@ defmodule SideoutWeb.Trainer.TemplateLive.Show do
       <div class="mx-auto max-w-3xl">
         <!-- Header -->
         <div class="mb-6">
-          <.link navigate={~p"/trainer/templates"} class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">
+          <.link
+            navigate={~p"/trainer/templates"}
+            class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+          >
             ← Back to Templates
           </.link>
         </div>
@@ -47,9 +50,11 @@ defmodule SideoutWeb.Trainer.TemplateLive.Show do
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-base font-semibold leading-6 text-neutral-900 dark:text-neutral-100">
-                  <%= @template.name %>
+                  {@template.name}
                 </h3>
-                <p class="mt-1 max-w-2xl text-sm text-neutral-600 dark:text-neutral-400">Template details and configuration</p>
+                <p class="mt-1 max-w-2xl text-sm text-neutral-600 dark:text-neutral-400">
+                  Template details and configuration
+                </p>
               </div>
               <div class="flex gap-2">
                 <.link
@@ -79,51 +84,63 @@ defmodule SideoutWeb.Trainer.TemplateLive.Show do
               </div>
 
               <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Day of Week</dt>
+                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                  Day of Week
+                </dt>
                 <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100 sm:col-span-2 sm:mt-0">
-                  <%= format_day(@template.day_of_week) %>
+                  {format_day(@template.day_of_week)}
                 </dd>
               </div>
 
               <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Time</dt>
                 <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100 sm:col-span-2 sm:mt-0">
-                  <%= format_time(@template.start_time) %> - <%= format_time(@template.end_time) %>
+                  {format_time(@template.start_time)} - {format_time(@template.end_time)}
                 </dd>
               </div>
 
               <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Skill Level</dt>
+                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                  Skill Level
+                </dt>
                 <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100 sm:col-span-2 sm:mt-0">
-                  <%= format_skill_level(@template.skill_level) %>
+                  {format_skill_level(@template.skill_level)}
                 </dd>
               </div>
 
               <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Fields Available</dt>
+                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                  Fields Available
+                </dt>
                 <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100 sm:col-span-2 sm:mt-0">
-                  <%= @template.fields_available %>
+                  {@template.fields_available}
                 </dd>
               </div>
 
               <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Capacity Constraints</dt>
+                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                  Capacity Constraints
+                </dt>
                 <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100 sm:col-span-2 sm:mt-0">
-                  <code class="rounded bg-neutral-100 px-2 py-1 dark:bg-secondary-700 dark:text-neutral-300"><%= @template.capacity_constraints %></code>
+                  <code class="rounded bg-neutral-100 px-2 py-1 dark:bg-secondary-700 dark:text-neutral-300">
+                    {@template.capacity_constraints}
+                  </code>
                 </dd>
               </div>
 
               <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Cancellation Deadline</dt>
+                <dt class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                  Cancellation Deadline
+                </dt>
                 <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100 sm:col-span-2 sm:mt-0">
-                  <%= @template.cancellation_deadline_hours %> hours before session
+                  {@template.cancellation_deadline_hours} hours before session
                 </dd>
               </div>
             </dl>
           </div>
         </div>
-
-        <!-- Actions -->
+        
+    <!-- Actions -->
         <div class="mt-6 flex gap-3">
           <.link
             navigate={~p"/trainer/sessions/new?template_id=#{@template.id}"}

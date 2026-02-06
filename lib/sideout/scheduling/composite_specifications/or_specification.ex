@@ -15,7 +15,7 @@ defmodule Sideout.Scheduling.CompositeSpecifications.OrSpecification do
       true  # 20 > 18 but 20 < (9 * 3) = 27
 
   ## Pattern Reference
-  
+
   Based on OrSpecification from:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

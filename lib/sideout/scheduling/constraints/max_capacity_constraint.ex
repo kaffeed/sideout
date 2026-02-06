@@ -14,7 +14,7 @@ defmodule Sideout.Scheduling.Constraints.MaxCapacityConstraint do
       "max_18"
 
   ## Pattern Reference
-  
+
   Atomic specification from the pure Specification pattern:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

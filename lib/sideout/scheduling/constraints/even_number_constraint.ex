@@ -1,7 +1,7 @@
 defmodule Sideout.Scheduling.Constraints.EvenNumberConstraint do
   @moduledoc """
   Constraint that requires an even number of players.
-  
+
   Useful for sports that require pairs or even teams (e.g., doubles tennis, partner drills).
 
   Part of the pure Specification pattern implementation.
@@ -15,7 +15,7 @@ defmodule Sideout.Scheduling.Constraints.EvenNumberConstraint do
       "even"
 
   ## Pattern Reference
-  
+
   Atomic specification from the pure Specification pattern:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

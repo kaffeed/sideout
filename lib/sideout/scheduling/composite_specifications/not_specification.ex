@@ -16,7 +16,7 @@ defmodule Sideout.Scheduling.CompositeSpecifications.NotSpecification do
       true  # 15 is odd, so NOT even
 
   ## Pattern Reference
-  
+
   Based on NotSpecification from:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

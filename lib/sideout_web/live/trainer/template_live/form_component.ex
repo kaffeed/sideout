@@ -9,7 +9,7 @@ defmodule SideoutWeb.Trainer.TemplateLive.FormComponent do
     ~H"""
     <div>
       <.header>
-        <%= @title %>
+        {@title}
         <:subtitle>
           Create a reusable template for recurring training sessions.
         </:subtitle>
@@ -83,8 +83,10 @@ defmodule SideoutWeb.Trainer.TemplateLive.FormComponent do
             <ul class="mt-1 space-y-1 text-xs text-info-700 dark:text-info-300">
               <%= for constraint <- @available_constraints do %>
                 <li>
-                  <code class="rounded bg-info-100 dark:bg-info-900/50 px-1 py-0.5"><%= constraint.example %></code>
-                  - <%= constraint.description %>
+                  <code class="rounded bg-info-100 dark:bg-info-900/50 px-1 py-0.5">
+                    {constraint.example}
+                  </code>
+                  - {constraint.description}
                 </li>
               <% end %>
             </ul>

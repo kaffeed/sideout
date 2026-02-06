@@ -1,7 +1,7 @@
 defmodule Sideout.Authorization do
   @moduledoc """
   Authorization logic for multi-club features.
-  
+
   Provides helper functions to check permissions for various actions
   across clubs, sessions, and players.
   """
@@ -43,7 +43,7 @@ defmodule Sideout.Authorization do
 
   @doc """
   Checks if a user can edit a session.
-  
+
   Returns true if the user is the creator or a co-trainer.
   """
   def can_edit_session?(user, session) do
@@ -52,7 +52,7 @@ defmodule Sideout.Authorization do
 
   @doc """
   Checks if a user can delete a session.
-  
+
   Only the session creator can delete it.
   """
   def can_delete_session?(user, session) do
@@ -61,7 +61,7 @@ defmodule Sideout.Authorization do
 
   @doc """
   Checks if a user can manage participants (add, remove, demote).
-  
+
   Returns true if the user is the creator or a co-trainer.
   """
   def can_manage_participants?(user, session) do
@@ -70,7 +70,7 @@ defmodule Sideout.Authorization do
 
   @doc """
   Checks if a user can add co-trainers to a session.
-  
+
   Only the session creator can add co-trainers.
   """
   def can_add_cotrainer?(user, session) do
@@ -79,7 +79,7 @@ defmodule Sideout.Authorization do
 
   @doc """
   Checks if a user can invite guest clubs to a session.
-  
+
   Returns true if the user is the creator or a co-trainer.
   """
   def can_invite_guest_club?(user, session) do
@@ -90,7 +90,7 @@ defmodule Sideout.Authorization do
 
   @doc """
   Checks if a user can manage players in a club.
-  
+
   All club members can manage players.
   """
   def can_manage_players?(user, club_id) do

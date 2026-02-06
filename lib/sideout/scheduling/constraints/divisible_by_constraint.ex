@@ -1,7 +1,7 @@
 defmodule Sideout.Scheduling.Constraints.DivisibleByConstraint do
   @moduledoc """
   Constraint that requires the number of players to be divisible by a specific value.
-  
+
   Useful for team formation (e.g., divisible by 6 for 6-player teams).
 
   Part of the pure Specification pattern implementation.
@@ -16,7 +16,7 @@ defmodule Sideout.Scheduling.Constraints.DivisibleByConstraint do
       "divisible_by_6"
 
   ## Pattern Reference
-  
+
   Atomic specification from the pure Specification pattern:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

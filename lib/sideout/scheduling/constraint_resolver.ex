@@ -8,7 +8,7 @@ defmodule Sideout.Scheduling.ConstraintResolver do
   ## Constraint String Format
 
   Constraints are stored as comma-separated strings in the format:
-  
+
       "constraint_name_value,constraint_name_value,..."
 
   ### Examples
@@ -39,12 +39,13 @@ defmodule Sideout.Scheduling.ConstraintResolver do
   See `Sideout.Scheduling.Specification` for more details on the pure pattern.
 
   ## Pattern Reference
-  
+
   Based on the Specification pattern from Domain-Driven Design:
   https://en.wikipedia.org/wiki/Specification_pattern
   """
 
   alias Sideout.Scheduling.Specification
+
   alias Sideout.Scheduling.Constraints.{
     MaxCapacityConstraint,
     MinCapacityConstraint,
@@ -75,7 +76,8 @@ defmodule Sideout.Scheduling.ConstraintResolver do
       [%PerFieldConstraint{players_per_field: 9}]
 
   """
-  def parse_constraints(constraint_string, fields_available \\ 1) when is_binary(constraint_string) do
+  def parse_constraints(constraint_string, fields_available \\ 1)
+      when is_binary(constraint_string) do
     constraint_string
     |> String.split(",", trim: true)
     |> Enum.map(&String.trim/1)
@@ -100,7 +102,8 @@ defmodule Sideout.Scheduling.ConstraintResolver do
       }
 
   """
-  def parse_to_specification(constraint_string, fields_available \\ 1) when is_binary(constraint_string) do
+  def parse_to_specification(constraint_string, fields_available \\ 1)
+      when is_binary(constraint_string) do
     constraint_string
     |> parse_constraints(fields_available)
     |> compose_with_and()
@@ -120,6 +123,7 @@ defmodule Sideout.Scheduling.ConstraintResolver do
   """
   def compose_with_and([]), do: nil
   def compose_with_and([spec]), do: spec
+
   def compose_with_and([first | rest]) do
     Enum.reduce(rest, first, fn spec, acc ->
       Specification.and_spec(acc, spec)

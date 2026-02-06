@@ -44,7 +44,7 @@ end
 
 Logger.info("Creating trainers...")
 
-trainer_1 = 
+trainer_1 =
   case Repo.get_by(User, email: "coach.mike@sideout.com") do
     nil ->
       %User{}
@@ -54,10 +54,12 @@ trainer_1 =
         password_confirmation: "password1234"
       })
       |> Repo.insert!()
-    user -> user
+
+    user ->
+      user
   end
 
-trainer_2 = 
+trainer_2 =
   case Repo.get_by(User, email: "coach.sarah@sideout.com") do
     nil ->
       %User{}
@@ -67,10 +69,12 @@ trainer_2 =
         password_confirmation: "password1234"
       })
       |> Repo.insert!()
-    user -> user
+
+    user ->
+      user
   end
 
-trainer_3 = 
+trainer_3 =
   case Repo.get_by(User, email: "coach.alex@sideout.com") do
     nil ->
       %User{}
@@ -80,7 +84,9 @@ trainer_3 =
         password_confirmation: "password1234"
       })
       |> Repo.insert!()
-    user -> user
+
+    user ->
+      user
   end
 
 Logger.info("Created #{3} trainers")
@@ -92,13 +98,22 @@ Logger.info("Created #{3} trainers")
 Logger.info("Creating players...")
 
 # 10 regular players (high attendance, reliable)
-regular_players = 
+regular_players =
   for i <- 1..10 do
-    name = [
-      "Emma Wilson", "Liam Johnson", "Olivia Martinez", "Noah Davis",
-      "Ava Brown", "Ethan Anderson", "Sophia Garcia", "Mason Taylor",
-      "Isabella Thomas", "William Moore"
-    ] |> Enum.at(i - 1)
+    name =
+      [
+        "Emma Wilson",
+        "Liam Johnson",
+        "Olivia Martinez",
+        "Noah Davis",
+        "Ava Brown",
+        "Ethan Anderson",
+        "Sophia Garcia",
+        "Mason Taylor",
+        "Isabella Thomas",
+        "William Moore"
+      ]
+      |> Enum.at(i - 1)
 
     %Player{}
     |> Player.changeset(%{
@@ -115,13 +130,22 @@ regular_players =
   end
 
 # 10 occasional players (medium attendance)
-occasional_players = 
+occasional_players =
   for i <- 1..10 do
-    name = [
-      "James White", "Charlotte Lee", "Benjamin Harris", "Amelia Clark",
-      "Lucas Lewis", "Mia Robinson", "Henry Walker", "Evelyn Young",
-      "Alexander Hall", "Harper Allen"
-    ] |> Enum.at(i - 1)
+    name =
+      [
+        "James White",
+        "Charlotte Lee",
+        "Benjamin Harris",
+        "Amelia Clark",
+        "Lucas Lewis",
+        "Mia Robinson",
+        "Henry Walker",
+        "Evelyn Young",
+        "Alexander Hall",
+        "Harper Allen"
+      ]
+      |> Enum.at(i - 1)
 
     %Player{}
     |> Player.changeset(%{
@@ -138,13 +162,22 @@ occasional_players =
   end
 
 # 10 new players (little or no history)
-new_players = 
+new_players =
   for i <- 1..10 do
-    name = [
-      "Daniel King", "Abigail Wright", "Michael Lopez", "Emily Hill",
-      "Elijah Scott", "Elizabeth Green", "Sebastian Adams", "Sofia Baker",
-      "Jack Nelson", "Avery Carter"
-    ] |> Enum.at(i - 1)
+    name =
+      [
+        "Daniel King",
+        "Abigail Wright",
+        "Michael Lopez",
+        "Emily Hill",
+        "Elijah Scott",
+        "Elizabeth Green",
+        "Sebastian Adams",
+        "Sofia Baker",
+        "Jack Nelson",
+        "Avery Carter"
+      ]
+      |> Enum.at(i - 1)
 
     %Player{}
     |> Player.changeset(%{
@@ -155,7 +188,8 @@ new_players =
       total_registrations: Enum.random(0..5),
       total_no_shows: 0,
       total_waitlists: Enum.random(0..2),
-      last_attendance_date: if(Enum.random(1..3) == 1, do: days_ago.(Enum.random(1..5)), else: nil)
+      last_attendance_date:
+        if(Enum.random(1..3) == 1, do: days_ago.(Enum.random(1..5)), else: nil)
     })
     |> Repo.insert!()
   end
@@ -169,7 +203,7 @@ Logger.info("Created #{length(all_players)} players")
 
 Logger.info("Creating session templates...")
 
-template_1 = 
+template_1 =
   %SessionTemplate{}
   |> SessionTemplate.changeset(%{
     name: "Monday Beginner",
@@ -185,7 +219,7 @@ template_1 =
   })
   |> Repo.insert!()
 
-template_2 = 
+template_2 =
   %SessionTemplate{}
   |> SessionTemplate.changeset(%{
     name: "Monday Advanced",
@@ -201,7 +235,7 @@ template_2 =
   })
   |> Repo.insert!()
 
-template_3 = 
+template_3 =
   %SessionTemplate{}
   |> SessionTemplate.changeset(%{
     name: "Wednesday Intermediate",
@@ -217,7 +251,7 @@ template_3 =
   })
   |> Repo.insert!()
 
-template_4 = 
+template_4 =
   %SessionTemplate{}
   |> SessionTemplate.changeset(%{
     name: "Friday Mixed",
@@ -233,7 +267,7 @@ template_4 =
   })
   |> Repo.insert!()
 
-template_5 = 
+template_5 =
   %SessionTemplate{}
   |> SessionTemplate.changeset(%{
     name: "Saturday Open",
@@ -263,7 +297,7 @@ Logger.info("Creating sessions...")
 sessions = []
 
 # Past session (1 week ago - Monday Advanced)
-past_session = 
+past_session =
   %Session{}
   |> Session.changeset(%{
     date: days_ago.(7),
@@ -281,7 +315,7 @@ past_session =
 sessions = [past_session | sessions]
 
 # This week's sessions
-monday_beginner_this_week = 
+monday_beginner_this_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(1),
@@ -298,7 +332,7 @@ monday_beginner_this_week =
 
 sessions = [monday_beginner_this_week | sessions]
 
-monday_advanced_this_week = 
+monday_advanced_this_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(1),
@@ -315,7 +349,7 @@ monday_advanced_this_week =
 
 sessions = [monday_advanced_this_week | sessions]
 
-wednesday_this_week = 
+wednesday_this_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(3),
@@ -332,7 +366,7 @@ wednesday_this_week =
 
 sessions = [wednesday_this_week | sessions]
 
-friday_this_week = 
+friday_this_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(5),
@@ -349,7 +383,7 @@ friday_this_week =
 
 sessions = [friday_this_week | sessions]
 
-saturday_this_week = 
+saturday_this_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(6),
@@ -367,7 +401,7 @@ saturday_this_week =
 sessions = [saturday_this_week | sessions]
 
 # Next week's sessions
-monday_beginner_next_week = 
+monday_beginner_next_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(8),
@@ -384,7 +418,7 @@ monday_beginner_next_week =
 
 sessions = [monday_beginner_next_week | sessions]
 
-monday_advanced_next_week = 
+monday_advanced_next_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(8),
@@ -401,7 +435,7 @@ monday_advanced_next_week =
 
 sessions = [monday_advanced_next_week | sessions]
 
-wednesday_next_week = 
+wednesday_next_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(10),
@@ -418,7 +452,7 @@ wednesday_next_week =
 
 sessions = [wednesday_next_week | sessions]
 
-friday_next_week = 
+friday_next_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(12),
@@ -435,7 +469,7 @@ friday_next_week =
 
 sessions = [friday_next_week | sessions]
 
-saturday_next_week = 
+saturday_next_week =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(13),
@@ -453,7 +487,7 @@ saturday_next_week =
 sessions = [saturday_next_week | sessions]
 
 # One-off special session (no template)
-special_session = 
+special_session =
   %Session{}
   |> Session.changeset(%{
     date: days_from_now.(14),
@@ -474,8 +508,11 @@ Logger.info("Created #{length(sessions)} sessions")
 
 # Verify all sessions have share tokens
 sessions_without_tokens = Enum.filter(sessions, fn s -> is_nil(s.share_token) end)
+
 if length(sessions_without_tokens) > 0 do
-  Logger.warning("Warning: #{length(sessions_without_tokens)} sessions created without share tokens!")
+  Logger.warning(
+    "Warning: #{length(sessions_without_tokens)} sessions created without share tokens!"
+  )
 else
   Logger.info("✓ All sessions have share tokens for public signup links")
 end
@@ -491,7 +528,7 @@ create_registration = fn session, player, status, opts ->
   registered_at = Keyword.get(opts, :registered_at, DateTime.utc_now())
   priority_score = Keyword.get(opts, :priority_score)
   position = Keyword.get(opts, :position)
-  
+
   %Registration{}
   |> Registration.changeset(%{
     session_id: session.id,
@@ -512,59 +549,59 @@ end
 
 # Monday Beginner This Week - Almost full (13/15), 2 waitlisted
 for {player, index} <- Enum.with_index(Enum.take(all_players, 13)) do
-  create_registration.(monday_beginner_this_week, player, :confirmed, [position: index + 1])
+  create_registration.(monday_beginner_this_week, player, :confirmed, position: index + 1)
 end
 
 for {player, index} <- Enum.with_index(Enum.slice(all_players, 13, 2)) do
-  create_registration.(monday_beginner_this_week, player, :waitlisted, [
+  create_registration.(monday_beginner_this_week, player, :waitlisted,
     priority_score: Decimal.from_float(120.0 - index * 5),
     position: index + 1
-  ])
+  )
 end
 
 # Monday Advanced This Week - Full (18/18), 5 waitlisted
 for {player, index} <- Enum.with_index(Enum.take(regular_players ++ occasional_players, 18)) do
-  create_registration.(monday_advanced_this_week, player, :confirmed, [position: index + 1])
+  create_registration.(monday_advanced_this_week, player, :confirmed, position: index + 1)
 end
 
 for {player, index} <- Enum.with_index(Enum.slice(all_players, 18, 5)) do
-  create_registration.(monday_advanced_this_week, player, :waitlisted, [
+  create_registration.(monday_advanced_this_week, player, :waitlisted,
     priority_score: Decimal.from_float(135.0 - index * 8),
     position: index + 1
-  ])
+  )
 end
 
 # Wednesday This Week - Good capacity (14/18 with 2 fields)
 for {player, index} <- Enum.with_index(Enum.take(all_players, 14)) do
-  create_registration.(wednesday_this_week, player, :confirmed, [position: index + 1])
+  create_registration.(wednesday_this_week, player, :confirmed, position: index + 1)
 end
 
 # Friday This Week - Needs to be divisible by 6, currently 12/18
 for {player, index} <- Enum.with_index(Enum.take(regular_players, 12)) do
-  create_registration.(friday_this_week, player, :confirmed, [position: index + 1])
+  create_registration.(friday_this_week, player, :confirmed, position: index + 1)
 end
 
 # Saturday This Week - Partially filled (16/20)
 for {player, index} <- Enum.with_index(Enum.take(all_players, 16)) do
-  create_registration.(saturday_this_week, player, :confirmed, [position: index + 1])
+  create_registration.(saturday_this_week, player, :confirmed, position: index + 1)
 end
 
 # Next week sessions - lighter registrations
 for {player, index} <- Enum.with_index(Enum.take(regular_players, 8)) do
-  create_registration.(monday_beginner_next_week, player, :confirmed, [position: index + 1])
+  create_registration.(monday_beginner_next_week, player, :confirmed, position: index + 1)
 end
 
 for {player, index} <- Enum.with_index(Enum.take(occasional_players, 10)) do
-  create_registration.(monday_advanced_next_week, player, :confirmed, [position: index + 1])
+  create_registration.(monday_advanced_next_week, player, :confirmed, position: index + 1)
 end
 
 for {player, index} <- Enum.with_index(Enum.take(all_players, 12)) do
-  create_registration.(wednesday_next_week, player, :confirmed, [position: index + 1])
+  create_registration.(wednesday_next_week, player, :confirmed, position: index + 1)
 end
 
 # Special session - just a few early birds
 for {player, index} <- Enum.with_index(Enum.take(regular_players, 5)) do
-  create_registration.(special_session, player, :confirmed, [position: index + 1])
+  create_registration.(special_session, player, :confirmed, position: index + 1)
 end
 
 registration_count = Repo.aggregate(Registration, :count)

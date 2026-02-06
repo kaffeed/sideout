@@ -35,12 +35,29 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
     Calendar.strftime(time, "%H:%M")
   end
 
-  defp status_badge_class(:confirmed), do: "bg-success-50 text-success-700 ring-success-600/20 dark:bg-success-900/30 dark:text-success-400 dark:ring-success-400/20"
-  defp status_badge_class(:waitlisted), do: "bg-warning-50 text-warning-700 ring-warning-600/20 dark:bg-warning-900/30 dark:text-warning-400 dark:ring-warning-400/20"
-  defp status_badge_class(:attended), do: "bg-info-50 text-info-700 ring-info-600/20 dark:bg-info-900/30 dark:text-info-400 dark:ring-info-400/20"
-  defp status_badge_class(:no_show), do: "bg-danger-50 text-danger-700 ring-danger-600/20 dark:bg-danger-900/30 dark:text-danger-400 dark:ring-danger-400/20"
-  defp status_badge_class(:cancelled), do: "bg-neutral-100 text-neutral-700 ring-neutral-600/20 dark:bg-secondary-700 dark:text-neutral-400 dark:ring-neutral-400/20"
-  defp status_badge_class(_), do: "bg-neutral-100 text-neutral-700 ring-neutral-600/20 dark:bg-secondary-700 dark:text-neutral-400 dark:ring-neutral-400/20"
+  defp status_badge_class(:confirmed),
+    do:
+      "bg-success-50 text-success-700 ring-success-600/20 dark:bg-success-900/30 dark:text-success-400 dark:ring-success-400/20"
+
+  defp status_badge_class(:waitlisted),
+    do:
+      "bg-warning-50 text-warning-700 ring-warning-600/20 dark:bg-warning-900/30 dark:text-warning-400 dark:ring-warning-400/20"
+
+  defp status_badge_class(:attended),
+    do:
+      "bg-info-50 text-info-700 ring-info-600/20 dark:bg-info-900/30 dark:text-info-400 dark:ring-info-400/20"
+
+  defp status_badge_class(:no_show),
+    do:
+      "bg-danger-50 text-danger-700 ring-danger-600/20 dark:bg-danger-900/30 dark:text-danger-400 dark:ring-danger-400/20"
+
+  defp status_badge_class(:cancelled),
+    do:
+      "bg-neutral-100 text-neutral-700 ring-neutral-600/20 dark:bg-secondary-700 dark:text-neutral-400 dark:ring-neutral-400/20"
+
+  defp status_badge_class(_),
+    do:
+      "bg-neutral-100 text-neutral-700 ring-neutral-600/20 dark:bg-secondary-700 dark:text-neutral-400 dark:ring-neutral-400/20"
 
   defp status_text(status) do
     status |> Atom.to_string() |> String.replace("_", " ") |> String.capitalize()
@@ -60,12 +77,14 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
             ← Back to Players
           </.link>
         </div>
-
+        
     <!-- Player Info Card -->
         <div class="mb-8 overflow-hidden bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500 sm:rounded-lg">
           <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
             <div>
-              <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{@player.name}</h1>
+              <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+                {@player.name}
+              </h1>
               <div class="mt-2 space-y-1">
                 <%= if @player.email do %>
                   <p class="text-sm text-neutral-600 dark:text-neutral-400">
@@ -94,35 +113,46 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
           <%= if @player.notes do %>
             <div class="border-t border-neutral-200 dark:border-secondary-700 px-4 py-5 sm:px-6">
               <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100 mb-2">Notes</h3>
-              <p class="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-wrap">{@player.notes}</p>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-wrap">
+                {@player.notes}
+              </p>
             </div>
           <% end %>
         </div>
-
+        
     <!-- Statistics Cards -->
         <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <!-- Total Sessions -->
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500 px-4 py-5 sm:p-6 transition-all duration-200 hover:shadow-sporty-lg">
-            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">Total Sessions</dt>
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              Total Sessions
+            </dt>
             <dd class="mt-1 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
               {@stats.total_sessions}
             </dd>
           </div>
-
+          
     <!-- Completed Sessions -->
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500 px-4 py-5 sm:p-6 transition-all duration-200 hover:shadow-sporty-lg">
-            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">Completed Sessions</dt>
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              Completed Sessions
+            </dt>
             <dd class="mt-1 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
               {@stats.completed_sessions}
             </dd>
           </div>
-
+          
     <!-- Attendance Rate -->
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500 px-4 py-5 sm:p-6 transition-all duration-200 hover:shadow-sporty-lg">
-            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">Attendance Rate</dt>
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              Attendance Rate
+            </dt>
             <dd class={[
               "mt-1 text-3xl font-semibold tracking-tight",
-              if(@stats.attendance_rate >= 80, do: "text-success-600 dark:text-success-400", else: "text-warning-600 dark:text-warning-400")
+              if(@stats.attendance_rate >= 80,
+                do: "text-success-600 dark:text-success-400",
+                else: "text-warning-600 dark:text-warning-400"
+              )
             ]}>
               {@stats.attendance_rate}%
             </dd>
@@ -130,13 +160,18 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
               {@stats.attended} attended / {@stats.completed_sessions} total
             </p>
           </div>
-
+          
     <!-- No-Show Rate -->
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500 px-4 py-5 sm:p-6 transition-all duration-200 hover:shadow-sporty-lg">
-            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">No-Show Rate</dt>
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              No-Show Rate
+            </dt>
             <dd class={[
               "mt-1 text-3xl font-semibold tracking-tight",
-              if(@stats.no_show_rate <= 10, do: "text-success-600 dark:text-success-400", else: "text-danger-600 dark:text-danger-400")
+              if(@stats.no_show_rate <= 10,
+                do: "text-success-600 dark:text-success-400",
+                else: "text-danger-600 dark:text-danger-400"
+              )
             ]}>
               {@stats.no_show_rate}%
             </dd>
@@ -145,10 +180,12 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
             </p>
           </div>
         </div>
-
+        
     <!-- Upcoming Sessions -->
         <div class="mb-8">
-          <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">Upcoming Sessions</h2>
+          <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+            Upcoming Sessions
+          </h2>
           <%= if @upcoming_registrations == [] do %>
             <div class="rounded-lg bg-neutral-50 dark:bg-secondary-800 px-4 py-12 text-center">
               <p class="text-sm text-neutral-600 dark:text-neutral-400">No upcoming sessions</p>
@@ -164,10 +201,16 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
                     >
                       Date & Time
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Template
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Status
                     </th>
                     <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -221,10 +264,12 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
             </div>
           <% end %>
         </div>
-
+        
     <!-- Registration History -->
         <div class="mb-8">
-          <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">Registration History</h2>
+          <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+            Registration History
+          </h2>
           <%= if @past_registrations == [] do %>
             <div class="rounded-lg bg-neutral-50 dark:bg-secondary-800 px-4 py-12 text-center">
               <p class="text-sm text-neutral-600 dark:text-neutral-400">No past sessions</p>
@@ -240,10 +285,16 @@ defmodule SideoutWeb.Trainer.PlayerLive.Show do
                     >
                       Date & Time
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Template
                     </th>
-                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <th
+                      scope="col"
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-neutral-900 dark:text-neutral-100"
+                    >
                       Status
                     </th>
                   </tr>

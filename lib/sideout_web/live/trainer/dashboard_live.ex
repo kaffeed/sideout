@@ -34,7 +34,7 @@ defmodule SideoutWeb.Trainer.DashboardLive do
       |> Sideout.Repo.preload([:registrations])
       |> Enum.filter(fn session ->
         Date.compare(session.date, today) != :lt and
-        Date.compare(session.date, two_weeks_later) != :gt
+          Date.compare(session.date, two_weeks_later) != :gt
       end)
 
     # Get active templates
@@ -81,9 +81,14 @@ defmodule SideoutWeb.Trainer.DashboardLive do
     confirmed = capacity_status.confirmed
 
     cond do
-      confirmed >= 15 -> "bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-400"
-      confirmed >= 10 -> "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400"
-      true -> "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400"
+      confirmed >= 15 ->
+        "bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-400"
+
+      confirmed >= 10 ->
+        "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400"
+
+      true ->
+        "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400"
     end
   end
 
@@ -99,34 +104,42 @@ defmodule SideoutWeb.Trainer.DashboardLive do
             Manage your volleyball sessions and players
           </p>
         </div>
-
-        <!-- Quick Stats -->
+        
+    <!-- Quick Stats -->
         <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 px-4 py-5 shadow-sporty border-t-4 border-primary-500 sm:p-6">
-            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">Total Sessions (2 weeks)</dt>
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              Total Sessions (2 weeks)
+            </dt>
             <dd class="mt-1 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-              <%= @stats.total_sessions %>
+              {@stats.total_sessions}
             </dd>
           </div>
 
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 px-4 py-5 shadow-sporty border-t-4 border-success-500 sm:p-6">
-            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">Total Registrations</dt>
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              Total Registrations
+            </dt>
             <dd class="mt-1 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-              <%= @stats.total_registrations %>
+              {@stats.total_registrations}
             </dd>
           </div>
 
           <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 px-4 py-5 shadow-sporty border-t-4 border-warning-500 sm:p-6">
-            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">Low Attendance Sessions</dt>
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">
+              Low Attendance Sessions
+            </dt>
             <dd class="mt-1 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-              <%= @stats.sessions_with_low_attendance %>
+              {@stats.sessions_with_low_attendance}
             </dd>
           </div>
         </div>
-
-        <!-- Quick Actions -->
+        
+    <!-- Quick Actions -->
         <div class="mb-8">
-          <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Quick Actions</h2>
+          <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+            Quick Actions
+          </h2>
           <div class="flex flex-wrap gap-3">
             <.link
               navigate={~p"/trainer/sessions/new"}
@@ -148,11 +161,13 @@ defmodule SideoutWeb.Trainer.DashboardLive do
             </.link>
           </div>
         </div>
-
-        <!-- Upcoming Sessions -->
+        
+    <!-- Upcoming Sessions -->
         <div>
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Upcoming Sessions</h2>
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+              Upcoming Sessions
+            </h2>
             <.link
               navigate={~p"/trainer/sessions"}
               class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
@@ -176,8 +191,12 @@ defmodule SideoutWeb.Trainer.DashboardLive do
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">No sessions scheduled</h3>
-              <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Get started by creating a new session.</p>
+              <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                No sessions scheduled
+              </h3>
+              <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                Get started by creating a new session.
+              </p>
               <div class="mt-6">
                 <.link
                   navigate={~p"/trainer/sessions/new"}
@@ -201,27 +220,27 @@ defmodule SideoutWeb.Trainer.DashboardLive do
                           <div class="flex-1">
                             <div class="flex items-center justify-between">
                               <p class="truncate text-sm font-medium text-primary-600 dark:text-primary-400">
-                                <%= format_date(session.date) %> - <%= format_time(
-                                  session.start_time
-                                ) %> to <%= format_time(session.end_time) %>
+                                {format_date(session.date)} - {format_time(session.start_time)} to {format_time(
+                                  session.end_time
+                                )}
                               </p>
                               <div class="ml-2 flex flex-shrink-0">
                                 <span class={[
                                   "inline-flex rounded-full px-2 text-xs font-semibold leading-5",
                                   capacity_badge_class(session)
                                 ]}>
-                                  <%= count_registrations(session, :confirmed) %> / <%= Scheduling.get_capacity_status(
+                                  {count_registrations(session, :confirmed)} / {Scheduling.get_capacity_status(
                                     session
-                                  ).description %>
+                                  ).description}
                                 </span>
                               </div>
                             </div>
                             <div class="mt-2 sm:flex sm:justify-between">
                               <div class="sm:flex">
                                 <p class="flex items-center text-sm text-neutral-500 dark:text-neutral-400">
-                                  <%= count_registrations(session, :confirmed) %> confirmed
+                                  {count_registrations(session, :confirmed)} confirmed
                                   <%= if count_registrations(session, :waitlisted) > 0 do %>
-                                    · <%= count_registrations(session, :waitlisted) %> waitlisted
+                                    · {count_registrations(session, :waitlisted)} waitlisted
                                   <% end %>
                                 </p>
                               </div>
@@ -237,7 +256,7 @@ defmodule SideoutWeb.Trainer.DashboardLive do
                                     clip-rule="evenodd"
                                   />
                                 </svg>
-                                <%= session.fields_available %> field(s)
+                                {session.fields_available} field(s)
                               </div>
                             </div>
                           </div>
@@ -250,11 +269,13 @@ defmodule SideoutWeb.Trainer.DashboardLive do
             </div>
           <% end %>
         </div>
-
-        <!-- Active Templates -->
+        
+    <!-- Active Templates -->
         <div class="mt-8">
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Active Templates</h2>
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+              Active Templates
+            </h2>
             <.link
               navigate={~p"/trainer/templates"}
               class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300"
@@ -274,15 +295,17 @@ defmodule SideoutWeb.Trainer.DashboardLive do
               <%= for template <- @templates do %>
                 <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500">
                   <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-base font-semibold text-neutral-900 dark:text-neutral-100"><%= template.name %></h3>
+                    <h3 class="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                      {template.name}
+                    </h3>
                     <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
                       <p>
-                        <%= template.day_of_week |> Atom.to_string() |> String.capitalize() %> · <%= format_time(
+                        {template.day_of_week |> Atom.to_string() |> String.capitalize()} · {format_time(
                           template.start_time
-                        ) %> - <%= format_time(template.end_time) %>
+                        )} - {format_time(template.end_time)}
                       </p>
                       <p class="mt-1">
-                        <%= template.skill_level |> Atom.to_string() |> String.capitalize() %>
+                        {template.skill_level |> Atom.to_string() |> String.capitalize()}
                       </p>
                     </div>
                   </div>

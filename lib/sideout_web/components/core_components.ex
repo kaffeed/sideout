@@ -50,7 +50,11 @@ defmodule SideoutWeb.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-neutral-50/90 dark:bg-neutral-950/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        id={"#{@id}-bg"}
+        class="bg-neutral-50/90 dark:bg-neutral-950/90 fixed inset-0 transition-opacity"
+        aria-hidden="true"
+      />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -79,7 +83,7 @@ defmodule SideoutWeb.CoreComponents do
                 </button>
               </div>
               <div id={"#{@id}-content"}>
-                <%= render_slot(@inner_block) %>
+                {render_slot(@inner_block)}
               </div>
             </.focus_wrap>
           </div>
@@ -116,17 +120,19 @@ defmodule SideoutWeb.CoreComponents do
       role="alert"
       class={[
         "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1 shadow-sporty",
-        @kind == :info && "bg-success-50 dark:bg-success-900/30 text-success-800 dark:text-success-100 ring-success-500 dark:ring-success-600 fill-success-900 dark:fill-success-100",
-        @kind == :error && "bg-danger-50 dark:bg-danger-900/30 text-danger-900 dark:text-danger-100 shadow-md ring-danger-500 dark:ring-danger-600 fill-danger-900 dark:fill-danger-100"
+        @kind == :info &&
+          "bg-success-50 dark:bg-success-900/30 text-success-800 dark:text-success-100 ring-success-500 dark:ring-success-600 fill-success-900 dark:fill-success-100",
+        @kind == :error &&
+          "bg-danger-50 dark:bg-danger-900/30 text-danger-900 dark:text-danger-100 shadow-md ring-danger-500 dark:ring-danger-600 fill-danger-900 dark:fill-danger-100"
       ]}
       {@rest}
     >
       <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
         <.icon :if={@kind == :info} name="hero-information-circle-mini" class="h-4 w-4" />
         <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" />
-        <%= @title %>
+        {@title}
       </p>
-      <p class="mt-2 text-sm leading-5"><%= msg %></p>
+      <p class="mt-2 text-sm leading-5">{msg}</p>
       <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
         <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
       </button>
@@ -157,7 +163,7 @@ defmodule SideoutWeb.CoreComponents do
         phx-connected={hide("#client-error")}
         hidden
       >
-        <%= gettext("Attempting to reconnect") %>
+        {gettext("Attempting to reconnect")}
         <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
       </.flash>
 
@@ -169,7 +175,7 @@ defmodule SideoutWeb.CoreComponents do
         phx-connected={hide("#server-error")}
         hidden
       >
-        <%= gettext("Hang in there while we get back on track") %>
+        {gettext("Hang in there while we get back on track")}
         <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
       </.flash>
     </div>
@@ -203,9 +209,9 @@ defmodule SideoutWeb.CoreComponents do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
       <div class="mt-10 space-y-8 bg-white dark:bg-secondary-800">
-        <%= render_slot(@inner_block, f) %>
+        {render_slot(@inner_block, f)}
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
-          <%= render_slot(action, f) %>
+          {render_slot(action, f)}
         </div>
       </div>
     </.form>
@@ -237,7 +243,7 @@ defmodule SideoutWeb.CoreComponents do
       ]}
       {@rest}
     >
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </button>
     """
   end
@@ -320,9 +326,9 @@ defmodule SideoutWeb.CoreComponents do
           class="rounded border-neutral-300 dark:border-secondary-600 text-primary-600 focus:ring-primary-500 dark:bg-secondary-700"
           {@rest}
         />
-        <%= @label %>
+        {@label}
       </label>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -330,7 +336,7 @@ defmodule SideoutWeb.CoreComponents do
   def input(%{type: "select"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id}>{@label}</.label>
       <select
         id={@id}
         name={@name}
@@ -338,10 +344,10 @@ defmodule SideoutWeb.CoreComponents do
         multiple={@multiple}
         {@rest}
       >
-        <option :if={@prompt} value=""><%= @prompt %></option>
-        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+        <option :if={@prompt} value="">{@prompt}</option>
+        {Phoenix.HTML.Form.options_for_select(@options, @value)}
       </select>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -349,7 +355,7 @@ defmodule SideoutWeb.CoreComponents do
   def input(%{type: "textarea"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id}>{@label}</.label>
       <textarea
         id={@id}
         name={@name}
@@ -361,7 +367,7 @@ defmodule SideoutWeb.CoreComponents do
         ]}
         {@rest}
       ><%= Phoenix.HTML.Form.normalize_value("textarea", @value) %></textarea>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -370,7 +376,7 @@ defmodule SideoutWeb.CoreComponents do
   def input(assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <.label for={@id}>{@label}</.label>
       <input
         type={@type}
         name={@name}
@@ -384,7 +390,7 @@ defmodule SideoutWeb.CoreComponents do
         ]}
         {@rest}
       />
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -397,8 +403,11 @@ defmodule SideoutWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-neutral-800 dark:text-neutral-200">
-      <%= render_slot(@inner_block) %>
+    <label
+      for={@for}
+      class="block text-sm font-semibold leading-6 text-neutral-800 dark:text-neutral-200"
+    >
+      {render_slot(@inner_block)}
     </label>
     """
   end
@@ -412,7 +421,7 @@ defmodule SideoutWeb.CoreComponents do
     ~H"""
     <p class="mt-3 flex gap-3 text-sm leading-6 text-danger-600 dark:text-danger-400 phx-no-feedback:hidden">
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </p>
     """
   end
@@ -431,13 +440,13 @@ defmodule SideoutWeb.CoreComponents do
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
         <h1 class="text-lg font-semibold leading-8 text-neutral-900 dark:text-neutral-100">
-          <%= render_slot(@inner_block) %>
+          {render_slot(@inner_block)}
         </h1>
         <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
-          <%= render_slot(@subtitle) %>
+          {render_slot(@subtitle)}
         </p>
       </div>
-      <div class="flex-none"><%= render_slot(@actions) %></div>
+      <div class="flex-none">{render_slot(@actions)}</div>
     </header>
     """
   end
@@ -478,9 +487,9 @@ defmodule SideoutWeb.CoreComponents do
       <table class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-neutral-500 dark:text-neutral-400">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
+            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal">{col[:label]}</th>
             <th :if={@action != []} class="relative p-0 pb-4">
-              <span class="sr-only"><%= gettext("Actions") %></span>
+              <span class="sr-only">{gettext("Actions")}</span>
             </th>
           </tr>
         </thead>
@@ -489,7 +498,11 @@ defmodule SideoutWeb.CoreComponents do
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-neutral-100 dark:divide-secondary-700 border-t border-neutral-200 dark:border-secondary-700 text-sm leading-6 text-neutral-700 dark:text-neutral-300"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-neutral-50 dark:hover:bg-secondary-700/50">
+          <tr
+            :for={row <- @rows}
+            id={@row_id && @row_id.(row)}
+            class="group hover:bg-neutral-50 dark:hover:bg-secondary-700/50"
+          >
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
@@ -497,8 +510,11 @@ defmodule SideoutWeb.CoreComponents do
             >
               <div class="block py-4 pr-6">
                 <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-neutral-50 dark:group-hover:bg-secondary-700/50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-neutral-900 dark:text-neutral-100"]}>
-                  <%= render_slot(col, @row_item.(row)) %>
+                <span class={[
+                  "relative",
+                  i == 0 && "font-semibold text-neutral-900 dark:text-neutral-100"
+                ]}>
+                  {render_slot(col, @row_item.(row))}
                 </span>
               </div>
             </td>
@@ -509,7 +525,7 @@ defmodule SideoutWeb.CoreComponents do
                   :for={action <- @action}
                   class="relative ml-4 font-semibold leading-6 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                 >
-                  <%= render_slot(action, @row_item.(row)) %>
+                  {render_slot(action, @row_item.(row))}
                 </span>
               </div>
             </td>
@@ -539,8 +555,8 @@ defmodule SideoutWeb.CoreComponents do
     <div class="mt-14">
       <dl class="-my-4 divide-y divide-neutral-100 dark:divide-secondary-700">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
-          <dt class="w-1/4 flex-none text-neutral-500 dark:text-neutral-400"><%= item.title %></dt>
-          <dd class="text-neutral-700 dark:text-neutral-300"><%= render_slot(item) %></dd>
+          <dt class="w-1/4 flex-none text-neutral-500 dark:text-neutral-400">{item.title}</dt>
+          <dd class="text-neutral-700 dark:text-neutral-300">{render_slot(item)}</dd>
         </div>
       </dl>
     </div>
@@ -565,7 +581,7 @@ defmodule SideoutWeb.CoreComponents do
         class="text-sm font-semibold leading-6 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
       >
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
-        <%= render_slot(@inner_block) %>
+        {render_slot(@inner_block)}
       </.link>
     </div>
     """

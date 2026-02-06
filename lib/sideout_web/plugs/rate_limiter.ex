@@ -14,11 +14,11 @@ defmodule SideoutWeb.Plugs.RateLimiter do
   def call(conn, _opts) do
     ip_address = get_ip_address(conn)
     key = "login:#{ip_address}"
-    
+
     case Hammer.check_rate(key, 60_000, 5) do
       {:allow, _count} ->
         conn
-      
+
       {:deny, _limit} ->
         conn
         |> put_flash(:error, "Too many login attempts. Please try again in a minute.")
@@ -29,8 +29,10 @@ defmodule SideoutWeb.Plugs.RateLimiter do
 
   defp get_ip_address(conn) do
     case get_req_header(conn, "x-forwarded-for") do
-      [ip | _] -> ip
-      [] -> 
+      [ip | _] ->
+        ip
+
+      [] ->
         case conn.remote_ip do
           {a, b, c, d} -> "#{a}.#{b}.#{c}.#{d}"
           ip -> to_string(ip)

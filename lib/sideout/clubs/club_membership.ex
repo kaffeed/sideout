@@ -18,7 +18,15 @@ defmodule Sideout.Clubs.ClubMembership do
   @doc false
   def changeset(membership, attrs) do
     membership
-    |> cast(attrs, [:user_id, :club_id, :role, :status, :requested_at, :approved_at, :approved_by_id])
+    |> cast(attrs, [
+      :user_id,
+      :club_id,
+      :role,
+      :status,
+      :requested_at,
+      :approved_at,
+      :approved_by_id
+    ])
     |> validate_required([:user_id, :club_id, :role, :status])
     |> validate_inclusion(:role, ["trainer", "admin"])
     |> validate_inclusion(:status, ["pending", "active", "rejected"])

@@ -8,7 +8,7 @@ defmodule SideoutWeb.Trainer.ClubLive.FormComponent do
     ~H"""
     <div>
       <.header>
-        <%= @title %>
+        {@title}
         <:subtitle>
           <%= if @action == :new do %>
             Create a new club to organize your training sessions and manage your team.
@@ -43,7 +43,7 @@ defmodule SideoutWeb.Trainer.ClubLive.FormComponent do
 
         <:actions>
           <.button phx-disable-with="Saving...">
-            <%= if @action == :new, do: "Create Club", else: "Save Changes" %>
+            {if @action == :new, do: "Create Club", else: "Save Changes"}
           </.button>
         </:actions>
       </.simple_form>

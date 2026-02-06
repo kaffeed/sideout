@@ -17,7 +17,7 @@ defmodule Sideout.Scheduling.CompositeSpecifications.AndNotSpecification do
       true  # 15 <= 18 AND 15 is NOT even
 
   ## Pattern Reference
-  
+
   Based on AndNotSpecification from:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

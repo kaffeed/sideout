@@ -12,13 +12,13 @@ defmodule Sideout.Scheduling.ShareTokenTest do
     test "generates unique tokens" do
       token1 = ShareToken.generate()
       token2 = ShareToken.generate()
-      
+
       assert token1 != token2
     end
 
     test "generates URL-safe tokens" do
       token = ShareToken.generate()
-      
+
       # Should only contain alphanumeric characters, hyphens, and underscores
       assert token =~ ~r/^[A-Za-z0-9_-]+$/
     end
@@ -26,7 +26,7 @@ defmodule Sideout.Scheduling.ShareTokenTest do
     test "generates multiple unique tokens" do
       tokens = for _ <- 1..100, do: ShareToken.generate()
       unique_tokens = Enum.uniq(tokens)
-      
+
       # All 100 tokens should be unique
       assert length(unique_tokens) == 100
     end

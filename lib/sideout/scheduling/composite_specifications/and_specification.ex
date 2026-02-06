@@ -15,7 +15,7 @@ defmodule Sideout.Scheduling.CompositeSpecifications.AndSpecification do
       true
 
   ## Pattern Reference
-  
+
   Based on AndSpecification from:
   https://en.wikipedia.org/wiki/Specification_pattern
   """

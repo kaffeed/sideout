@@ -8,7 +8,10 @@ defmodule Sideout.Scheduling.SessionTemplate do
   schema "session_templates" do
     field :active, :boolean, default: true
     field :name, :string
-    field :day_of_week, Ecto.Enum, values: [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
+    field :day_of_week, Ecto.Enum,
+      values: [:monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+
     field :start_time, :time
     field :end_time, :time
     field :skill_level, Ecto.Enum, values: [:beginner, :intermediate, :advanced, :mixed]
@@ -31,8 +34,28 @@ defmodule Sideout.Scheduling.SessionTemplate do
   @doc false
   def changeset(session_template, attrs) do
     session_template
-    |> cast(attrs, [:name, :day_of_week, :start_time, :end_time, :skill_level, :fields_available, :capacity_constraints, :cancellation_deadline_hours, :active, :user_id, :club_id])
-    |> validate_required([:name, :day_of_week, :start_time, :end_time, :skill_level, :capacity_constraints, :club_id])
+    |> cast(attrs, [
+      :name,
+      :day_of_week,
+      :start_time,
+      :end_time,
+      :skill_level,
+      :fields_available,
+      :capacity_constraints,
+      :cancellation_deadline_hours,
+      :active,
+      :user_id,
+      :club_id
+    ])
+    |> validate_required([
+      :name,
+      :day_of_week,
+      :start_time,
+      :end_time,
+      :skill_level,
+      :capacity_constraints,
+      :club_id
+    ])
     |> validate_number(:fields_available, greater_than: 0)
     |> validate_number(:cancellation_deadline_hours, greater_than_or_equal_to: 0)
     |> validate_time_order()
@@ -52,14 +75,22 @@ defmodule Sideout.Scheduling.SessionTemplate do
 
   defp validate_constraint_format(changeset) do
     case get_change(changeset, :capacity_constraints) do
-      nil -> changeset
-      "" -> add_error(changeset, :capacity_constraints, "cannot be empty")
-      constraints -> 
+      nil ->
+        changeset
+
+      "" ->
+        add_error(changeset, :capacity_constraints, "cannot be empty")
+
+      constraints ->
         # Basic validation - just check it's a string with comma-separated values
         if String.match?(constraints, ~r/^[a-z_0-9]+(,[a-z_0-9]+)*$/) do
           changeset
         else
-          add_error(changeset, :capacity_constraints, "must be comma-separated constraint names (e.g., 'max_18,min_12')")
+          add_error(
+            changeset,
+            :capacity_constraints,
+            "must be comma-separated constraint names (e.g., 'max_18,min_12')"
+          )
         end
     end
   end
@@ -75,10 +106,12 @@ defmodule Sideout.Scheduling.SessionTemplate do
 
   """
   def with_parsed_constraints(%__MODULE__{} = template) do
-    constraints = ConstraintResolver.parse_constraints(
-      template.capacity_constraints,
-      template.fields_available
-    )
+    constraints =
+      ConstraintResolver.parse_constraints(
+        template.capacity_constraints,
+        template.fields_available
+      )
+
     %{template | constraint_list: constraints}
   end
 
@@ -101,10 +134,12 @@ defmodule Sideout.Scheduling.SessionTemplate do
 
   def with_capacity_spec(%__MODULE__{} = template) do
     # Parse from string and compose with AND
-    spec = ConstraintResolver.parse_to_specification(
-      template.capacity_constraints,
-      template.fields_available
-    )
+    spec =
+      ConstraintResolver.parse_to_specification(
+        template.capacity_constraints,
+        template.fields_available
+      )
+
     %{template | capacity_spec: spec}
   end
 end

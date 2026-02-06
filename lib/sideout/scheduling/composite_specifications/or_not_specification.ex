@@ -17,7 +17,7 @@ defmodule Sideout.Scheduling.CompositeSpecifications.OrNotSpecification do
       true  # 10 <= 18 OR 10 < 12 (NOT satisfied)
 
   ## Pattern Reference
-  
+
   Based on OrNotSpecification from:
   https://en.wikipedia.org/wiki/Specification_pattern
   """
