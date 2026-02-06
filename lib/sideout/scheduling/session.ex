@@ -25,7 +25,12 @@ defmodule Sideout.Scheduling.Session do
 
     belongs_to :session_template, SessionTemplate
     belongs_to :user, User
+    belongs_to :club, Sideout.Clubs.Club
     has_many :registrations, Registration
+    has_many :guest_clubs, Sideout.Scheduling.SessionGuestClub
+    has_many :invited_clubs, through: [:guest_clubs, :club]
+    has_many :session_cotrainers, Sideout.Scheduling.SessionCotrainer
+    has_many :cotrainers, through: [:session_cotrainers, :user]
 
     timestamps(type: :utc_datetime)
   end
@@ -33,8 +38,8 @@ defmodule Sideout.Scheduling.Session do
   @doc false
   def changeset(session, attrs) do
     session
-    |> cast(attrs, [:date, :start_time, :end_time, :fields_available, :capacity_constraints, :cancellation_deadline_hours, :notes, :status, :session_template_id, :user_id, :share_token])
-    |> validate_required([:date, :start_time, :end_time, :capacity_constraints])
+    |> cast(attrs, [:date, :start_time, :end_time, :fields_available, :capacity_constraints, :cancellation_deadline_hours, :notes, :status, :session_template_id, :user_id, :share_token, :club_id])
+    |> validate_required([:date, :start_time, :end_time, :capacity_constraints, :club_id])
     |> validate_number(:fields_available, greater_than: 0)
     |> validate_number(:cancellation_deadline_hours, greater_than_or_equal_to: 0)
     |> validate_time_order()

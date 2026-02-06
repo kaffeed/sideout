@@ -87,6 +87,12 @@ defmodule SideoutWeb.Router do
       # Dashboard
       live "/dashboard", DashboardLive, :index
 
+      # Clubs
+      live "/clubs", ClubLive.Index, :index
+      live "/clubs/new", ClubLive.Index, :new
+      live "/clubs/:id", ClubLive.Show, :show
+      live "/clubs/:id/edit", ClubLive.Show, :edit
+
       # Session Templates
       live "/templates", TemplateLive.Index, :index
       live "/templates/new", TemplateLive.Index, :new

@@ -3,3 +3,80 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+/* CSS Custom Properties for Runtime Theming */
+:root {
+  /* Primary (Brand Orange) - Light Mode */
+  --color-primary-50: 255 245 237;
+  --color-primary-100: 255 232 213;
+  --color-primary-200: 254 205 170;
+  --color-primary-300: 253 170 116;
+  --color-primary-400: 251 124 60;
+  --color-primary-500: 253 79 0;
+  --color-primary-600: 230 63 0;
+  --color-primary-700: 194 51 0;
+  --color-primary-800: 154 43 7;
+  --color-primary-900: 124 37 8;
+
+  /* Neutral/Background - Light Mode */
+  --color-bg-primary: 255 255 255;
+  --color-bg-secondary: 249 250 251;
+  --color-bg-tertiary: 243 244 246;
+  
+  /* Text - Light Mode */
+  --color-text-primary: 17 24 39;
+  --color-text-secondary: 107 114 128;
+  --color-text-tertiary: 156 163 175;
+
+  /* Border - Light Mode */
+  --color-border-primary: 229 231 235;
+  --color-border-secondary: 209 213 219;
+}
+
+.dark {
+  /* Primary (Softer Orange) - Dark Mode */
+  --color-primary-50: 67 16 4;
+  --color-primary-100: 124 37 8;
+  --color-primary-200: 154 43 7;
+  --color-primary-300: 194 51 0;
+  --color-primary-400: 230 63 0;
+  --color-primary-500: 255 107 26;
+  --color-primary-600: 253 79 0;
+  --color-primary-700: 251 124 60;
+  --color-primary-800: 253 170 116;
+  --color-primary-900: 254 205 170;
+
+  /* Neutral/Background - Dark Mode */
+  --color-bg-primary: 15 23 42;
+  --color-bg-secondary: 30 41 59;
+  --color-bg-tertiary: 51 65 85;
+  
+  /* Text - Dark Mode */
+  --color-text-primary: 248 250 252;
+  --color-text-secondary: 203 213 225;
+  --color-text-tertiary: 148 163 184;
+
+  /* Border - Dark Mode */
+  --color-border-primary: 51 65 85;
+  --color-border-secondary: 71 85 105;
+}
+
+/* Smooth color transitions for theme switching */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Sporty enhancements */
+.sporty-card {
+  @apply bg-white dark:bg-secondary-800 rounded-lg shadow-lg border-t-4 border-primary-500 transition-all duration-200 hover:shadow-sporty-lg;
+}
+
+.sporty-btn-primary {
+  @apply bg-gradient-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-sporty transition-all duration-200 hover:scale-105 active:scale-95;
+}
+
+.sporty-input {
+  @apply bg-white dark:bg-secondary-800 border-2 border-neutral-300 dark:border-secondary-600 rounded-lg px-4 py-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 transition-all duration-200;
+}

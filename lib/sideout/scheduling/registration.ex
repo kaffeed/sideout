@@ -12,6 +12,7 @@ defmodule Sideout.Scheduling.Registration do
     field :cancelled_at, :utc_datetime
     field :cancellation_reason, :string
     field :cancellation_token, :string
+    field :is_trainer, :boolean, default: false
 
     belongs_to :session, Session
     belongs_to :player, Player
@@ -22,7 +23,7 @@ defmodule Sideout.Scheduling.Registration do
   @doc false
   def changeset(registration, attrs) do
     registration
-    |> cast(attrs, [:status, :priority_score, :position, :registered_at, :cancelled_at, :cancellation_reason, :cancellation_token, :session_id, :player_id])
+    |> cast(attrs, [:status, :priority_score, :position, :registered_at, :cancelled_at, :cancellation_reason, :cancellation_token, :session_id, :player_id, :is_trainer])
     |> validate_required([:session_id, :player_id])
     |> validate_number(:priority_score, greater_than_or_equal_to: 0)
     |> validate_number(:position, greater_than: 0)

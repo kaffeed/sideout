@@ -3,6 +3,7 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
 
   alias Sideout.Scheduling
   alias Sideout.Scheduling.Session
+  alias Sideout.Clubs
 
   @impl true
   def mount(_params, _session, socket) do
@@ -70,6 +71,18 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
      |> load_sessions()}
   end
 
+  def handle_event("filter_by_club", %{"club_id" => club_id}, socket) do
+    selected_club_id = case club_id do
+      "" -> nil
+      id -> String.to_integer(id)
+    end
+    
+    {:noreply,
+     socket
+     |> assign(:selected_club_id, selected_club_id)
+     |> load_sessions()}
+  end
+
   def handle_event("delete", %{"id" => id}, socket) do
     session = Scheduling.get_session!(id)
     {:ok, _} = Scheduling.delete_session(session)
@@ -88,27 +101,42 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
 
   defp assign_defaults(socket) do
     today = Date.utc_today()
+    user = socket.assigns.current_user
+    
+    # Load user's clubs
+    user_clubs = Clubs.list_clubs_for_user(user.id)
     
     socket
     |> assign(:current_date, today)
     |> assign(:sessions_by_date, %{})
+    |> assign(:user_clubs, user_clubs)
+    |> assign(:selected_club_id, nil)  # nil means show all clubs
   end
 
   defp load_sessions(socket) do
     user = socket.assigns.current_user
     current_date = socket.assigns.current_date
+    selected_club_id = socket.assigns.selected_club_id
     
     # Get first and last day of the month
     first_day = Date.beginning_of_month(current_date)
     last_day = Date.end_of_month(current_date)
     
-    # Load sessions for this month
-    sessions = Scheduling.list_sessions(
-      user_id: user.id,
-      from_date: first_day,
-      to_date: last_day,
-      preload: [:registrations]
-    )
+    # Load sessions for user (including co-trainer sessions)
+    sessions = 
+      Scheduling.list_sessions_for_user(user.id)
+      |> Sideout.Repo.preload([:registrations, :club])
+      |> Enum.filter(fn session ->
+        Date.compare(session.date, first_day) != :lt and
+        Date.compare(session.date, last_day) != :gt
+      end)
+    
+    # Apply club filter if selected
+    sessions = if selected_club_id do
+      Enum.filter(sessions, &(&1.club_id == selected_club_id))
+    else
+      sessions
+    end
     
     # Group sessions by date
     sessions_by_date = Enum.group_by(sessions, & &1.date)
@@ -169,13 +197,13 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
   end
 
   defp capacity_badge_class(session) do
-    capacity_status = Scheduling.get_capacity_status(session)
+    capacity_status = Scheduling.get_capacity_status_excluding_trainers(session)
     confirmed = capacity_status.confirmed
 
     cond do
-      confirmed >= 15 -> "bg-green-100 text-green-800 border-green-200"
-      confirmed >= 10 -> "bg-yellow-100 text-yellow-800 border-yellow-200"
-      true -> "bg-red-100 text-red-800 border-red-200"
+      confirmed >= 15 -> "bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-400 border-success-200 dark:border-success-700"
+      confirmed >= 10 -> "bg-warning-100 dark:bg-warning-900/30 text-warning-800 dark:text-warning-400 border-warning-200 dark:border-warning-700"
+      true -> "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400 border-danger-200 dark:border-danger-700"
     end
   end
 
@@ -187,48 +215,68 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
         <!-- Header -->
         <div class="mb-8 flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900">Sessions</h1>
-            <p class="mt-2 text-sm text-gray-600">
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">Sessions</h1>
+            <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
               Manage your volleyball training sessions
             </p>
           </div>
           <.link
             patch={~p"/trainer/sessions/new"}
-            class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+            class="inline-flex items-center rounded-md bg-primary-500 dark:bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-md hover:shadow-sporty hover:bg-primary-600 dark:hover:bg-primary-500 transition-all duration-200"
           >
             Create Session
           </.link>
         </div>
 
         <!-- Calendar Navigation -->
-        <div class="mb-6 flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow">
-          <button
-            phx-click="prev_month"
-            class="inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-          >
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Previous
-          </button>
+        <div class="mb-6 rounded-lg bg-white dark:bg-secondary-800 px-4 py-3 shadow-sporty">
+          <div class="flex items-center justify-between gap-4">
+            <button
+              phx-click="prev_month"
+              class="inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-secondary-700 transition-colors"
+            >
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Previous
+            </button>
 
-          <h2 class="text-lg font-semibold text-gray-900"><%= @month_name %></h2>
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"><%= @month_name %></h2>
 
-          <button
-            phx-click="next_month"
-            class="inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
-          >
-            Next
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+            <!-- Club Filter -->
+            <div class="flex items-center gap-2">
+              <label for="club-filter" class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Club:</label>
+              <select
+                id="club-filter"
+                phx-change="filter_by_club"
+                name="club_id"
+                class="block rounded-md border-neutral-300 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-neutral-900 dark:text-neutral-100 py-1.5 pl-3 pr-10 text-sm focus:border-primary-500 focus:ring-primary-500"
+              >
+                <option value="">All Clubs</option>
+                <%= for membership <- @user_clubs do %>
+                  <option value={membership.club.id} selected={@selected_club_id == membership.club.id}>
+                    <%= membership.club.name %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+
+            <button
+              phx-click="next_month"
+              class="inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-secondary-700 transition-colors"
+            >
+              Next
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Calendar Grid -->
-        <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty">
           <!-- Day Headers -->
-          <div class="grid grid-cols-7 border-b border-gray-200 bg-gray-50 text-center text-xs font-semibold leading-6 text-gray-700">
+          <div class="grid grid-cols-7 border-b border-neutral-200 dark:border-secondary-700 bg-neutral-50 dark:bg-secondary-900 text-center text-xs font-semibold leading-6 text-neutral-700 dark:text-neutral-300">
             <div class="py-2">Mon</div>
             <div class="py-2">Tue</div>
             <div class="py-2">Wed</div>
@@ -239,20 +287,20 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
           </div>
 
           <!-- Calendar Body -->
-          <div class="grid grid-cols-7 bg-white text-xs leading-6 text-gray-700">
+          <div class="grid grid-cols-7 bg-white dark:bg-secondary-800 text-xs leading-6 text-neutral-700 dark:text-neutral-300">
             <%= for week <- @calendar_weeks do %>
               <%= for day <- week do %>
                 <div class={[
-                  "relative min-h-[120px] border-b border-r border-gray-200 p-2",
-                  unless(day.in_month, do: "bg-gray-50"),
-                  if(day.is_today, do: "bg-blue-50")
+                  "relative min-h-[120px] border-b border-r border-neutral-200 dark:border-secondary-700 p-2",
+                  unless(day.in_month, do: "bg-neutral-50 dark:bg-secondary-900"),
+                  if(day.is_today, do: "bg-primary-50 dark:bg-primary-900/20")
                 ]}>
                   <!-- Date Number -->
                   <.link
                     patch={~p"/trainer/sessions/new?date=#{Date.to_iso8601(day.date)}"}
                     class={[
-                      "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold hover:bg-gray-200",
-                      if(day.is_today, do: "bg-indigo-600 text-white hover:bg-indigo-700", else: "text-gray-900")
+                      "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold hover:bg-neutral-200 dark:hover:bg-secondary-600",
+                      if(day.is_today, do: "bg-primary-600 dark:bg-primary-500 text-white hover:bg-primary-700 dark:hover:bg-primary-600", else: "text-neutral-900 dark:text-neutral-100")
                     ]}
                   >
                     <%= day.date.day %>
@@ -264,13 +312,18 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
                       <.link
                         navigate={~p"/trainer/sessions/#{session.id}"}
                         class={[
-                          "block rounded border px-1.5 py-1 text-xs hover:shadow-sm",
+                          "block rounded border px-1.5 py-1 text-xs hover:shadow-sm transition-all",
                           capacity_badge_class(session)
                         ]}
                       >
                         <div class="font-semibold">
                           <%= format_time(session.start_time) %>
                         </div>
+                        <%= if session.club do %>
+                          <div class="text-xs font-medium truncate">
+                            <%= session.club.name %>
+                          </div>
+                        <% end %>
                         <div class="text-xs">
                           <%= count_registrations(session, :confirmed) %> players
                         </div>
@@ -278,7 +331,7 @@ defmodule SideoutWeb.Trainer.SessionLive.Index do
                     <% end %>
 
                     <%= if length(day.sessions) > 3 do %>
-                      <div class="px-1.5 text-xs font-medium text-gray-500">
+                      <div class="px-1.5 text-xs font-medium text-neutral-500 dark:text-neutral-400">
                         +<%= length(day.sessions) - 3 %> more
                       </div>
                     <% end %>

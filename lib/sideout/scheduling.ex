@@ -27,6 +27,7 @@ defmodule Sideout.Scheduling do
     * `:preload` - List of associations to preload
     * `:order_by` - Field to order by (default: :name)
     * `:search` - Search term for name
+    * `:club_id` - Filter by club ID
 
   ## Examples
 
@@ -36,18 +37,26 @@ defmodule Sideout.Scheduling do
       iex> list_players(preload: [:registrations])
       [%Player{registrations: [...]}, ...]
 
+      iex> list_players(club_id: 1)
+      [%Player{club_id: 1}, ...]
+
   """
   def list_players(opts \\ []) do
     preload = Keyword.get(opts, :preload, [])
     order_by = Keyword.get(opts, :order_by, :name)
     search = Keyword.get(opts, :search)
+    club_id = Keyword.get(opts, :club_id)
 
     Player
+    |> maybe_filter_by_club(club_id)
     |> maybe_search_players(search)
     |> order_by(^order_by)
     |> Repo.all()
     |> Repo.preload(preload)
   end
+
+  defp maybe_filter_by_club(query, nil), do: query
+  defp maybe_filter_by_club(query, club_id), do: where(query, [p], p.club_id == ^club_id)
 
   defp maybe_search_players(query, nil), do: query
 
@@ -79,18 +88,32 @@ defmodule Sideout.Scheduling do
   end
 
   @doc """
-  Gets a player by name, or creates one if it doesn't exist.
+  Gets a player by name and club_id, or creates one if it doesn't exist.
 
   ## Examples
 
-      iex> get_or_create_player_by_name("John Doe")
+      iex> get_or_create_player_by_name("John Doe", %{"club_id" => 1})
       {:ok, %Player{}}
 
   """
   def get_or_create_player_by_name(name, attrs \\ %{}) do
-    case Repo.get_by(Player, name: name) do
+    club_id = attrs["club_id"] || Map.get(attrs, :club_id)
+    
+    # Build query that handles nil club_id properly
+    player = 
+      if club_id do
+        Repo.get_by(Player, name: name, club_id: club_id)
+      else
+        from(p in Player, where: p.name == ^name and is_nil(p.club_id))
+        |> Repo.one()
+      end
+    
+    case player do
       nil ->
-        attrs = Map.put(attrs, "name", name)
+        attrs = 
+          attrs
+          |> Map.put("name", name)
+          |> (fn a -> if club_id, do: Map.put(a, "club_id", club_id), else: a end).()
         create_player(attrs)
 
       player ->
@@ -390,6 +413,7 @@ defmodule Sideout.Scheduling do
     status = Keyword.get(opts, :status)
     user_id = Keyword.get(opts, :user_id)
     skill_level = Keyword.get(opts, :skill_level)
+    club_id = Keyword.get(opts, :club_id)
 
     Session
     |> maybe_filter_from_date(from_date)
@@ -397,6 +421,7 @@ defmodule Sideout.Scheduling do
     |> maybe_filter_status(status)
     |> maybe_filter_user_id(user_id)
     |> maybe_filter_skill_level(skill_level)
+    |> maybe_filter_club_id(club_id)
     |> order_by([s], [s.date, s.start_time])
     |> Repo.all()
     |> Repo.preload(preload)
@@ -423,6 +448,9 @@ defmodule Sideout.Scheduling do
     |> join(:left, [s], st in assoc(s, :session_template))
     |> where([s, st], st.skill_level == ^skill_level)
   end
+
+  defp maybe_filter_club_id(query, nil), do: query
+  defp maybe_filter_club_id(query, club_id), do: where(query, club_id: ^club_id)
 
   @doc """
   Returns the list of upcoming sessions (from today forward).
@@ -735,18 +763,43 @@ defmodule Sideout.Scheduling do
       {:error, :already_registered}
   """
   def register_player(%Session{} = session, %Player{} = player, attrs \\ %{}) do
-    # Check if player is already registered
-    existing =
+    require Logger
+    
+    # Check if player is already registered with active status
+    existing_active =
       Registration
       |> where(session_id: ^session.id, player_id: ^player.id)
       |> where([r], r.status in [:confirmed, :waitlisted])
       |> Repo.one()
 
-    if existing do
+    if existing_active do
+      Logger.info("register_player: Player #{player.id} already has active registration for session #{session.id}")
       {:error, :already_registered}
     else
-      # Get capacity status to determine if player should be confirmed or waitlisted
-      capacity_status = get_capacity_status(session)
+      # Check if there's a cancelled registration we can reuse
+      existing_cancelled =
+        Registration
+        |> where(session_id: ^session.id, player_id: ^player.id)
+        |> where([r], r.status == :cancelled)
+        |> Repo.one()
+
+      if existing_cancelled do
+        Logger.info("register_player: Found cancelled registration #{existing_cancelled.id}, will reuse it")
+      else
+        Logger.info("register_player: No existing registration, will create new one")
+      end
+
+      # Check if this is a trainer registration
+      is_trainer = Map.get(attrs, "is_trainer", false)
+      
+      # Get capacity status (excluding trainers if this is a trainer registration)
+      capacity_status = 
+        if is_trainer do
+          # Trainers always get confirmed, don't check capacity
+          %{can_add_player: true}
+        else
+          get_capacity_status_excluding_trainers(session)
+        end
 
       # Determine registration status and priority
       {status, priority_score} =
@@ -758,7 +811,7 @@ defmodule Sideout.Scheduling do
           {:waitlisted, priority}
         end
 
-      # Generate cancellation token
+      # Generate new cancellation token
       cancellation_token = RegistrationToken.generate_cancellation_token()
 
       # Build registration attributes
@@ -769,15 +822,29 @@ defmodule Sideout.Scheduling do
         |> Map.put("status", status)
         |> Map.put("cancellation_token", cancellation_token)
         |> Map.put("priority_score", priority_score)
+        |> Map.put("registered_at", DateTime.utc_now())
+        |> Map.put("cancelled_at", nil)
+        |> Map.put("cancellation_reason", nil)
 
-      # Create registration
+      # Create or update registration
       result =
-        %Registration{}
-        |> Registration.create_changeset(registration_attrs)
-        |> Repo.insert()
+        if existing_cancelled do
+          Logger.info("register_player: Updating cancelled registration #{existing_cancelled.id} to status #{status}")
+          # Reuse the cancelled registration
+          existing_cancelled
+          |> Registration.create_changeset(registration_attrs)
+          |> Repo.update()
+        else
+          Logger.info("register_player: Inserting new registration with status #{status}")
+          # Create new registration
+          %Registration{}
+          |> Registration.create_changeset(registration_attrs)
+          |> Repo.insert()
+        end
 
       case result do
         {:ok, registration} ->
+          Logger.info("register_player: Success! Registration ID: #{registration.id}, Status: #{registration.status}")
           # Broadcast PubSub event
           broadcast_session_update(session.id, :player_registered, %{
             player_id: player.id,
@@ -787,6 +854,7 @@ defmodule Sideout.Scheduling do
           {:ok, Repo.preload(registration, [:session, :player])}
 
         {:error, changeset} ->
+          Logger.error("register_player: Failed with errors: #{inspect(changeset.errors)}")
           {:error, changeset}
       end
     end
@@ -1183,5 +1251,304 @@ defmodule Sideout.Scheduling do
     else
       {:ok, :waitlisted}
     end
+  end
+
+  ## Co-Trainer Management
+
+  alias Sideout.Scheduling.SessionCotrainer
+  alias Sideout.Clubs
+
+  @doc """
+  Adds a co-trainer to a session.
+  
+  The trainer must be a member of the session's club.
+  """
+  def add_cotrainer(session, trainer_user_id, added_by_user_id) do
+    # Validate trainer is member of session's club
+    unless Clubs.is_club_member?(trainer_user_id, session.club_id) do
+      {:error, :not_club_member}
+    else
+      %SessionCotrainer{}
+      |> SessionCotrainer.changeset(%{
+        session_id: session.id,
+        user_id: trainer_user_id,
+        added_by_id: added_by_user_id
+      })
+      |> Repo.insert()
+    end
+  end
+
+  @doc """
+  Removes a co-trainer from a session.
+  """
+  def remove_cotrainer(session, trainer_user_id) do
+    from(sc in SessionCotrainer,
+      where: sc.session_id == ^session.id and sc.user_id == ^trainer_user_id
+    )
+    |> Repo.delete_all()
+  end
+
+  @doc """
+  Lists all co-trainers for a session.
+  """
+  def list_cotrainers(session) do
+    session
+    |> Repo.preload(:cotrainers)
+    |> Map.get(:cotrainers)
+  end
+
+  ## Guest Club Management
+
+  alias Sideout.Scheduling.SessionGuestClub
+
+  @doc """
+  Invites a guest club to a session.
+  
+  Cannot invite the primary club as a guest.
+  """
+  def invite_guest_club(session, club_id, invited_by_user_id) do
+    # Can't invite primary club
+    if session.club_id == club_id do
+      {:error, :cannot_invite_primary_club}
+    else
+      %SessionGuestClub{}
+      |> SessionGuestClub.changeset(%{
+        session_id: session.id,
+        club_id: club_id,
+        invited_by_id: invited_by_user_id
+      })
+      |> Repo.insert()
+    end
+  end
+
+  @doc """
+  Removes a guest club from a session.
+  """
+  def remove_guest_club(session, club_id) do
+    from(gc in SessionGuestClub,
+      where: gc.session_id == ^session.id and gc.club_id == ^club_id
+    )
+    |> Repo.delete_all()
+  end
+
+  @doc """
+  Lists all guest clubs for a session.
+  """
+  def list_guest_clubs(session_or_id) do
+    session = case session_or_id do
+      %Session{} = s -> s
+      id when is_integer(id) -> get_session!(id)
+    end
+    
+    session
+    |> Repo.preload(:invited_clubs)
+    |> Map.get(:invited_clubs)
+  end
+
+  ## Trainer Participation
+
+  alias Sideout.Accounts
+
+  @doc """
+  Registers a trainer as a participant in a session.
+  
+  Trainer registrations don't count toward capacity constraints.
+  """
+  def register_trainer_participation(session, user_id) do
+    # Get or create player record for trainer
+    trainer = Accounts.get_user!(user_id)
+    
+    player = 
+      case Repo.get_by(Player, name: trainer.email, club_id: session.club_id) do
+        nil -> 
+          {:ok, p} = create_player(%{
+            "name" => trainer.email,
+            "email" => trainer.email,
+            "club_id" => session.club_id
+          })
+          p
+        existing -> existing
+      end
+    
+    # Register with is_trainer flag set to true
+    register_player(session, player, %{"is_trainer" => true})
+  end
+
+  @doc """
+  Unregisters a trainer's participation in a session.
+  """
+  def unregister_trainer_participation(session, user_id) do
+    trainer = Accounts.get_user!(user_id)
+    
+    from(r in Registration,
+      join: p in Player, on: r.player_id == p.id,
+      where: r.session_id == ^session.id and 
+             p.name == ^trainer.email and
+             r.is_trainer == true
+    )
+    |> Repo.one()
+    |> case do
+      nil -> {:error, :not_found}
+      registration -> cancel_registration(registration, "Trainer left session")
+    end
+  end
+
+  @doc """
+  Lists all trainer participants for a session.
+  """
+  def list_trainer_participants(session) do
+    from(r in Registration,
+      where: r.session_id == ^session.id and r.is_trainer == true,
+      preload: [:player]
+    )
+    |> Repo.all()
+  end
+
+  ## Participant Management
+
+  @doc """
+  Removes a participant from a session.
+  
+  This cancels their registration with a reason.
+  """
+  def remove_participant(registration_id, _manager_user_id) do
+    registration = Repo.get!(Registration, registration_id)
+    cancel_registration(registration, "Removed by trainer")
+  end
+
+  @doc """
+  Demotes a confirmed participant to the waitlist.
+  """
+  def demote_to_waitlist(registration_id, _manager_user_id) do
+    registration = Repo.get!(Registration, registration_id) |> Repo.preload(:session)
+    
+    if registration.status == :confirmed do
+      registration
+      |> Registration.changeset(%{status: :waitlisted})
+      |> Repo.update()
+      |> case do
+        {:ok, updated} ->
+          # Broadcast change
+          broadcast_session_update(registration.session_id, :participant_demoted, %{
+            registration_id: updated.id,
+            player_id: updated.player_id
+          })
+          {:ok, updated}
+        error -> error
+      end
+    else
+      {:error, :not_confirmed}
+    end
+  end
+
+  ## Session Management (Multi-Club)
+
+  @doc """
+  Lists all sessions for a user across all their clubs.
+  
+  Includes sessions where the user is the creator or a co-trainer.
+  """
+  def list_sessions_for_user(user_id) do
+    # Get all clubs user belongs to
+    club_ids = 
+      from(m in Sideout.Clubs.ClubMembership,
+        where: m.user_id == ^user_id and m.status == "active",
+        select: m.club_id
+      )
+      |> Repo.all()
+    
+    # Get sessions from user's clubs + sessions where user is co-trainer
+    from(s in Session,
+      left_join: sc in SessionCotrainer, on: sc.session_id == s.id,
+      where: s.club_id in ^club_ids or sc.user_id == ^user_id,
+      distinct: true,
+      order_by: [asc: s.date, asc: s.start_time]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Lists all sessions for a specific club.
+  """
+  def list_sessions_for_club(club_id, opts \\ []) do
+    status = Keyword.get(opts, :status)
+    
+    query = from(s in Session,
+      where: s.club_id == ^club_id,
+      order_by: [asc: s.date, asc: s.start_time]
+    )
+    
+    query = if status do
+      where(query, [s], s.status == ^status)
+    else
+      query
+    end
+    
+    Repo.all(query)
+  end
+
+  @doc """
+  Checks if a user can manage a session.
+  
+  Returns true if the user is the creator or a co-trainer.
+  """
+  def can_manage_session?(session, user_id) do
+    session.user_id == user_id or 
+      from(sc in SessionCotrainer,
+        where: sc.session_id == ^session.id and sc.user_id == ^user_id
+      )
+      |> Repo.exists?()
+  end
+
+  ## Capacity Management (Updated for Trainer Exclusion)
+
+  @doc """
+  Gets capacity status for a session, excluding trainer registrations.
+  
+  This is an updated version that filters out is_trainer=true registrations
+  from capacity calculations.
+  """
+  def get_capacity_status_excluding_trainers(%Session{} = session) do
+    constraints =
+      ConstraintResolver.parse_constraints(
+        session.capacity_constraints,
+        session.fields_available
+      )
+
+    # Count only non-trainer registrations
+    confirmed_count = 
+      from(r in Registration,
+        where: r.session_id == ^session.id and 
+               r.status == :confirmed and
+               r.is_trainer == false
+      )
+      |> Repo.aggregate(:count)
+    
+    waitlist_count =
+      from(r in Registration,
+        where: r.session_id == ^session.id and 
+               r.status == :waitlisted and
+               r.is_trainer == false
+      )
+      |> Repo.aggregate(:count)
+
+    session_state = %{
+      confirmed_count: confirmed_count,
+      waitlist_count: waitlist_count,
+      fields_available: session.fields_available
+    }
+
+    can_add = ConstraintResolver.can_add_player?(constraints, session_state)
+    satisfied = ConstraintResolver.all_satisfied?(constraints, session_state)
+    unsatisfied = ConstraintResolver.unsatisfied_constraints(constraints, session_state)
+
+    %{
+      confirmed: confirmed_count,
+      waitlist: waitlist_count,
+      can_add_player: can_add,
+      constraints_satisfied: satisfied,
+      unsatisfied_constraints: unsatisfied,
+      description: ConstraintResolver.describe_constraints(constraints)
+    }
   end
 end

@@ -38,6 +38,62 @@ Hooks.CopyToClipboard = {
   }
 }
 
+Hooks.PlayerCache = {
+  mounted() {
+    // Wait for the element to be fully connected before loading data
+    // This ensures the LiveView WebSocket connection is established
+    const sessionId = this.el.dataset.sessionId
+    
+    // Only proceed if we have a valid session ID
+    if (!sessionId || sessionId === "" || sessionId === "null" || sessionId === "undefined") {
+      console.log("PlayerCache: No valid session ID found, skipping cache load")
+      return
+    }
+    
+    console.log("PlayerCache: Loading cached data for session", sessionId)
+    
+    // Load cached player data on mount
+    const cachedName = localStorage.getItem("sideout_player_name") || ""
+    const cancellationTokens = JSON.parse(localStorage.getItem("sideout_cancellation_tokens") || "{}")
+    const cancellationToken = cancellationTokens[sessionId] || null
+    
+    console.log("PlayerCache: Found cached name:", cachedName)
+    console.log("PlayerCache: Found cancellation token:", cancellationToken ? "yes" : "no")
+    
+    // Send cached data to server
+    this.pushEvent("load_cached_data", {
+      name: cachedName,
+      cancellation_token: cancellationToken
+    })
+    
+    // Handle save name command from server
+    this.handleEvent("save_player_name", ({name}) => {
+      console.log("PlayerCache: Saving player name:", name)
+      if (name && name.trim() !== "") {
+        localStorage.setItem("sideout_player_name", name.trim())
+      }
+    })
+    
+    // Handle save cancellation token command from server
+    this.handleEvent("save_cancellation_token", ({session_id, token}) => {
+      console.log("PlayerCache: Saving cancellation token for session", session_id)
+      const tokens = JSON.parse(localStorage.getItem("sideout_cancellation_tokens") || "{}")
+      tokens[session_id] = token
+      localStorage.setItem("sideout_cancellation_tokens", JSON.stringify(tokens))
+      console.log("PlayerCache: Tokens after save:", tokens)
+    })
+    
+    // Handle clear cancellation token command from server
+    this.handleEvent("clear_cancellation_token", ({session_id}) => {
+      console.log("PlayerCache: Clearing cancellation token for session", session_id)
+      const tokens = JSON.parse(localStorage.getItem("sideout_cancellation_tokens") || "{}")
+      delete tokens[session_id]
+      localStorage.setItem("sideout_cancellation_tokens", JSON.stringify(tokens))
+      console.log("PlayerCache: Tokens after clear:", tokens)
+    })
+  }
+}
+
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},

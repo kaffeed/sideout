@@ -9,6 +9,11 @@ defmodule Sideout.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 
+    has_many :club_memberships, Sideout.Clubs.ClubMembership
+    has_many :clubs, through: [:club_memberships, :club]
+    has_many :created_clubs, Sideout.Clubs.Club, foreign_key: :created_by_id
+    has_many :cotrainer_sessions, Sideout.Scheduling.SessionCotrainer
+
     timestamps(type: :utc_datetime)
   end
 

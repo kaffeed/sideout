@@ -132,10 +132,10 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
 
   defp status_badge_class(status) do
     case status do
-      :confirmed -> "bg-blue-100 text-blue-800"
-      :attended -> "bg-green-100 text-green-800"
-      :no_show -> "bg-red-100 text-red-800"
-      _ -> "bg-gray-100 text-gray-800"
+      :confirmed -> "bg-info-50 dark:bg-info-900/30 text-info-600 dark:text-info-400"
+      :attended -> "bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-400"
+      :no_show -> "bg-danger-100 dark:bg-danger-900/30 text-danger-800 dark:text-danger-400"
+      _ -> "bg-neutral-100 dark:bg-secondary-700 text-neutral-800 dark:text-neutral-100"
     end
   end
 
@@ -157,7 +157,7 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
         <div class="mb-6">
           <.link
             navigate={~p"/trainer/sessions/#{@session}"}
-            class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
+            class="inline-flex items-center text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300"
           >
             <svg class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -173,38 +173,38 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
 
         <!-- Session Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900">Mark Attendance</h1>
-          <p class="mt-2 text-lg text-gray-600">
+          <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">Mark Attendance</h1>
+          <p class="mt-2 text-lg text-neutral-600 dark:text-neutral-400">
             {format_date(@session.date)} • {format_time(@session.start_time)} - {format_time(@session.end_time)}
           </p>
         </div>
 
         <!-- Attendance Statistics -->
         <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
-          <div class="rounded-lg bg-white px-4 py-5 shadow">
-            <dt class="truncate text-sm font-medium text-gray-500">Total Confirmed</dt>
-            <dd class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <div class="rounded-lg bg-white dark:bg-secondary-800 px-4 py-5 shadow-sporty border-t-4 border-primary-500">
+            <dt class="truncate text-sm font-medium text-neutral-500 dark:text-neutral-400">Total Confirmed</dt>
+            <dd class="mt-1 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
               {@stats.total_confirmed}
             </dd>
           </div>
 
-          <div class="rounded-lg bg-green-50 px-4 py-5 shadow">
-            <dt class="truncate text-sm font-medium text-green-600">Attended</dt>
-            <dd class="mt-1 text-3xl font-semibold tracking-tight text-green-900">
+          <div class="rounded-lg bg-success-50 dark:bg-success-900/30 px-4 py-5 shadow-sporty border-t-4 border-success-600">
+            <dt class="truncate text-sm font-medium text-success-600 dark:text-success-400">Attended</dt>
+            <dd class="mt-1 text-3xl font-semibold tracking-tight text-success-900 dark:text-success-400">
               {@stats.attended}
             </dd>
           </div>
 
-          <div class="rounded-lg bg-red-50 px-4 py-5 shadow">
-            <dt class="truncate text-sm font-medium text-red-600">No-Shows</dt>
-            <dd class="mt-1 text-3xl font-semibold tracking-tight text-red-900">
+          <div class="rounded-lg bg-danger-50 dark:bg-danger-900/30 px-4 py-5 shadow-sporty border-t-4 border-danger-600">
+            <dt class="truncate text-sm font-medium text-danger-600 dark:text-danger-400">No-Shows</dt>
+            <dd class="mt-1 text-3xl font-semibold tracking-tight text-danger-900 dark:text-danger-400">
               {@stats.no_shows}
             </dd>
           </div>
 
-          <div class="rounded-lg bg-blue-50 px-4 py-5 shadow">
-            <dt class="truncate text-sm font-medium text-blue-600">Pending</dt>
-            <dd class="mt-1 text-3xl font-semibold tracking-tight text-blue-900">
+          <div class="rounded-lg bg-info-50 dark:bg-info-900/30 px-4 py-5 shadow-sporty border-t-4 border-info-600">
+            <dt class="truncate text-sm font-medium text-info-600 dark:text-info-400">Pending</dt>
+            <dd class="mt-1 text-3xl font-semibold tracking-tight text-info-900 dark:text-info-400">
               {@stats.pending}
             </dd>
           </div>
@@ -212,15 +212,15 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
 
         <!-- Attendance Rate -->
         <%= if @stats.total_confirmed > 0 do %>
-          <div class="mb-6 rounded-lg bg-indigo-50 p-4">
+          <div class="mb-6 rounded-lg bg-primary-50 dark:bg-primary-900/30 p-4 border-t-4 border-primary-500">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-indigo-800">Attendance Rate</p>
-                <p class="text-xs text-indigo-600">
+                <p class="text-sm font-medium text-primary-800 dark:text-primary-400">Attendance Rate</p>
+                <p class="text-xs text-primary-600 dark:text-primary-300">
                   {@stats.attended} out of {@stats.total_confirmed} confirmed players
                 </p>
               </div>
-              <div class="text-3xl font-bold text-indigo-900">
+              <div class="text-3xl font-bold text-primary-900 dark:text-primary-400">
                 {@stats.attendance_rate}%
               </div>
             </div>
@@ -229,14 +229,14 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
 
         <!-- Bulk Actions -->
         <%= if @stats.pending > 0 do %>
-          <div class="mb-6 flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="mb-6 flex items-center justify-between rounded-lg border border-neutral-200 dark:border-secondary-700 bg-white dark:bg-secondary-800 p-4 shadow-sm">
             <div>
-              <h3 class="text-sm font-medium text-gray-900">Bulk Actions</h3>
-              <p class="text-xs text-gray-500">Mark all pending check-ins at once</p>
+              <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Bulk Actions</h3>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400">Mark all pending check-ins at once</p>
             </div>
             <button
               phx-click="mark_all_attended"
-              class="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+              class="rounded-md bg-success-600 dark:bg-success-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:shadow-sporty hover:bg-success-500 dark:hover:bg-success-500 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-success-600"
             >
               Mark All Attended
             </button>
@@ -244,9 +244,9 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
         <% end %>
 
         <!-- Player List -->
-        <div class="overflow-hidden rounded-lg bg-white shadow">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">
+        <div class="overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500">
+          <div class="px-6 py-4 border-b border-neutral-200 dark:border-secondary-700">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
               Players ({length(@registrations)})
             </h2>
           </div>
@@ -254,7 +254,7 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
           <%= if Enum.empty?(@registrations) do %>
             <div class="px-6 py-12 text-center">
               <svg
-                class="mx-auto h-12 w-12 text-gray-400"
+                class="mx-auto h-12 w-12 text-neutral-400 dark:text-neutral-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -266,60 +266,60 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
                   d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              <h3 class="mt-2 text-sm font-semibold text-gray-900">No players registered</h3>
-              <p class="mt-1 text-sm text-gray-500">
+              <h3 class="mt-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">No players registered</h3>
+              <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                 No confirmed players for this session yet.
               </p>
             </div>
           <% else %>
             <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+              <table class="min-w-full divide-y divide-neutral-200 dark:divide-secondary-700">
+                <thead class="bg-neutral-50 dark:bg-secondary-900">
                   <tr>
                     <th
                       scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                      class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
                     >
                       Player
                     </th>
                     <th
                       scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                      class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
                     >
                       Contact
                     </th>
                     <th
                       scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
+                      class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
                     >
                       Status
                     </th>
                     <th
                       scope="col"
-                      class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500"
+                      class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-neutral-500 dark:text-neutral-400"
                     >
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
+                <tbody class="divide-y divide-neutral-200 dark:divide-secondary-700 bg-white dark:bg-secondary-800">
                   <%= for registration <- @registrations do %>
                     <tr>
                       <td class="whitespace-nowrap px-6 py-4">
-                        <div class="text-sm font-medium text-gray-900">
+                        <div class="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                           {registration.player.name}
                         </div>
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
-                        <div class="text-sm text-gray-900">
+                        <div class="text-sm text-neutral-900 dark:text-neutral-100">
                           <%= if registration.player.email do %>
                             {registration.player.email}
                           <% else %>
-                            <span class="text-gray-400">No email</span>
+                            <span class="text-neutral-400 dark:text-neutral-500">No email</span>
                           <% end %>
                         </div>
                         <%= if registration.player.phone do %>
-                          <div class="text-xs text-gray-500">
+                          <div class="text-xs text-neutral-500 dark:text-neutral-400">
                             {registration.player.phone}
                           </div>
                         <% end %>
@@ -337,7 +337,7 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
                           <button
                             phx-click="mark_attended"
                             phx-value-registration_id={registration.id}
-                            class="inline-flex items-center gap-1 rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 mr-2"
+                            class="inline-flex items-center gap-1 rounded-md bg-success-600 dark:bg-success-600 px-3 py-1.5 text-sm font-semibold text-white shadow-md hover:shadow-sporty hover:bg-success-500 dark:hover:bg-success-500 transition-all duration-200 mr-2"
                           >
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path
@@ -352,7 +352,7 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
                           <button
                             phx-click="mark_no_show"
                             phx-value-registration_id={registration.id}
-                            class="inline-flex items-center gap-1 rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500"
+                            class="inline-flex items-center gap-1 rounded-md bg-danger-600 dark:bg-danger-600 px-3 py-1.5 text-sm font-semibold text-white shadow-md hover:shadow-sporty hover:bg-danger-500 dark:hover:bg-danger-500 transition-all duration-200"
                           >
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path
@@ -365,7 +365,7 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
                             No-Show
                           </button>
                         <% else %>
-                          <span class="text-gray-500 italic">
+                          <span class="text-neutral-500 dark:text-neutral-400 italic">
                             Marked
                           </span>
                         <% end %>
@@ -380,10 +380,10 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
 
         <!-- Complete Session Notice -->
         <%= if @stats.pending == 0 and @stats.total_confirmed > 0 do %>
-          <div class="mt-6 rounded-lg bg-green-50 p-4">
+          <div class="mt-6 rounded-lg bg-success-50 dark:bg-success-900/30 p-4">
             <div class="flex">
               <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 text-success-400 dark:text-success-400" viewBox="0 0 20 20" fill="currentColor">
                   <path
                     fill-rule="evenodd"
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -392,8 +392,8 @@ defmodule SideoutWeb.Trainer.AttendanceLive do
                 </svg>
               </div>
               <div class="ml-3">
-                <h3 class="text-sm font-medium text-green-800">Attendance Complete</h3>
-                <div class="mt-2 text-sm text-green-700">
+                <h3 class="text-sm font-medium text-success-800 dark:text-success-400">Attendance Complete</h3>
+                <div class="mt-2 text-sm text-success-700 dark:text-success-400">
                   <p>
                     All players have been marked. You can now return to the session details.
                   </p>

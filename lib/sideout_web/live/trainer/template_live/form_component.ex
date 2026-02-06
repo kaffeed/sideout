@@ -68,7 +68,7 @@ defmodule SideoutWeb.Trainer.TemplateLive.FormComponent do
 
         <div>
           <.label>Capacity Constraints</.label>
-          <p class="mt-1 text-sm text-gray-500">
+          <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
             Define capacity rules (comma-separated). Examples: max_18, min_12, even, per_field_9, divisible_by_6
           </p>
           <.input
@@ -78,12 +78,12 @@ defmodule SideoutWeb.Trainer.TemplateLive.FormComponent do
             required
           />
 
-          <div class="mt-2 rounded-md bg-blue-50 p-3">
-            <p class="text-xs font-medium text-blue-800">Available Constraints:</p>
-            <ul class="mt-1 space-y-1 text-xs text-blue-700">
+          <div class="mt-2 rounded-md bg-info-50 dark:bg-info-900/30 p-3">
+            <p class="text-xs font-medium text-info-800 dark:text-info-400">Available Constraints:</p>
+            <ul class="mt-1 space-y-1 text-xs text-info-700 dark:text-info-300">
               <%= for constraint <- @available_constraints do %>
                 <li>
-                  <code class="rounded bg-blue-100 px-1 py-0.5"><%= constraint.example %></code>
+                  <code class="rounded bg-info-100 dark:bg-info-900/50 px-1 py-0.5"><%= constraint.example %></code>
                   - <%= constraint.description %>
                 </li>
               <% end %>

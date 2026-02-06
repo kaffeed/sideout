@@ -23,6 +23,7 @@ defmodule Sideout.Scheduling.SessionTemplate do
     field :capacity_spec, :any, virtual: true
 
     belongs_to :user, User
+    belongs_to :club, Sideout.Clubs.Club
 
     timestamps(type: :utc_datetime)
   end
@@ -30,8 +31,8 @@ defmodule Sideout.Scheduling.SessionTemplate do
   @doc false
   def changeset(session_template, attrs) do
     session_template
-    |> cast(attrs, [:name, :day_of_week, :start_time, :end_time, :skill_level, :fields_available, :capacity_constraints, :cancellation_deadline_hours, :active, :user_id])
-    |> validate_required([:name, :day_of_week, :start_time, :end_time, :skill_level, :capacity_constraints])
+    |> cast(attrs, [:name, :day_of_week, :start_time, :end_time, :skill_level, :fields_available, :capacity_constraints, :cancellation_deadline_hours, :active, :user_id, :club_id])
+    |> validate_required([:name, :day_of_week, :start_time, :end_time, :skill_level, :capacity_constraints, :club_id])
     |> validate_number(:fields_available, greater_than: 0)
     |> validate_number(:cancellation_deadline_hours, greater_than_or_equal_to: 0)
     |> validate_time_order()

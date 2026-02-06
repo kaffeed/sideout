@@ -111,17 +111,17 @@ defmodule SideoutWeb.CancellationLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-neutral-50 dark:bg-secondary-900 px-4 py-16 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-md">
         <!-- Invalid Token Error -->
         <%= if @error == :invalid_token do %>
-          <div class="rounded-lg bg-white p-8 shadow">
+          <div class="rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-danger-500 p-8">
             <div class="text-center">
-              <svg class="mx-auto h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="mx-auto h-12 w-12 text-danger-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
-              <h2 class="mt-4 text-2xl font-bold text-gray-900">Invalid Cancellation Link</h2>
-              <p class="mt-2 text-sm text-gray-600">
+              <h2 class="mt-4 text-2xl font-bold text-neutral-900 dark:text-neutral-100">Invalid Cancellation Link</h2>
+              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                 This cancellation link is invalid or has expired. Please contact your trainer if you need assistance.
               </p>
             </div>
@@ -130,17 +130,17 @@ defmodule SideoutWeb.CancellationLive do
 
         <!-- Already Cancelled Error -->
         <%= if @error == :already_cancelled do %>
-          <div class="rounded-lg bg-white p-8 shadow">
+          <div class="rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-neutral-300 dark:border-secondary-600 p-8">
             <div class="text-center">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h2 class="mt-4 text-2xl font-bold text-gray-900">Already Cancelled</h2>
-              <p class="mt-2 text-sm text-gray-600">
+              <h2 class="mt-4 text-2xl font-bold text-neutral-900 dark:text-neutral-100">Already Cancelled</h2>
+              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                 This registration has already been cancelled.
               </p>
               <%= if @registration.cancelled_at do %>
-                <p class="mt-1 text-xs text-gray-500">
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                   Cancelled on <%= format_datetime(@registration.cancelled_at) %>
                 </p>
               <% end %>
@@ -150,16 +150,16 @@ defmodule SideoutWeb.CancellationLive do
 
         <!-- Cancellation Failed Error -->
         <%= if @error == :cancellation_failed do %>
-          <div class="mb-4 rounded-lg bg-red-50 p-4">
+          <div class="mb-4 rounded-lg bg-danger-50 dark:bg-danger-900/30 p-4">
             <div class="flex">
               <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 text-danger-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
               </div>
               <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">Cancellation Failed</h3>
-                <p class="mt-1 text-sm text-red-700">
+                <h3 class="text-sm font-medium text-danger-800 dark:text-danger-400">Cancellation Failed</h3>
+                <p class="mt-1 text-sm text-danger-700 dark:text-danger-300">
                   There was an error cancelling your registration. Please try again or contact your trainer.
                 </p>
               </div>
@@ -169,26 +169,26 @@ defmodule SideoutWeb.CancellationLive do
 
         <!-- Success Message -->
         <%= if @cancelled_successfully do %>
-          <div class="rounded-lg bg-white p-8 shadow">
+          <div class="rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-success-500 p-8">
             <div class="text-center">
-              <svg class="mx-auto h-12 w-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="mx-auto h-12 w-12 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h2 class="mt-4 text-2xl font-bold text-gray-900">Registration Cancelled</h2>
-              <p class="mt-2 text-sm text-gray-600">
+              <h2 class="mt-4 text-2xl font-bold text-neutral-900 dark:text-neutral-100">Registration Cancelled</h2>
+              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                 Your registration has been successfully cancelled.
               </p>
 
               <%= if @deadline_warning do %>
-                <div class="mt-4 rounded-md bg-yellow-50 p-4">
-                  <p class="text-sm text-yellow-800">
+                <div class="mt-4 rounded-md bg-warning-50 dark:bg-warning-900/30 p-4">
+                  <p class="text-sm text-warning-800 dark:text-warning-400">
                     Note: This cancellation was made after the deadline. Please be mindful of cancellation deadlines in the future.
                   </p>
                 </div>
               <% end %>
 
               <div class="mt-6">
-                <p class="text-sm text-gray-600 text-center">
+                <p class="text-sm text-neutral-600 dark:text-neutral-400 text-center">
                   If you have any questions or need to register for another session, please contact your trainer directly.
                 </p>
               </div>
@@ -198,39 +198,39 @@ defmodule SideoutWeb.CancellationLive do
 
         <!-- Cancellation Form -->
         <%= if !@error && !@cancelled_successfully do %>
-          <div class="rounded-lg bg-white p-8 shadow">
+          <div class="rounded-lg bg-white dark:bg-secondary-800 shadow-sporty border-t-4 border-primary-500 p-8">
             <div>
-              <h2 class="text-2xl font-bold text-gray-900">Cancel Registration</h2>
-              <p class="mt-2 text-sm text-gray-600">
+              <h2 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Cancel Registration</h2>
+              <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                 Are you sure you want to cancel your registration for this session?
               </p>
             </div>
 
             <!-- Session Details -->
-            <div class="mt-6 border-t border-gray-200 pt-6">
+            <div class="mt-6 border-t border-neutral-200 dark:border-secondary-700 pt-6">
               <dl class="space-y-4">
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Session Date</dt>
-                  <dd class="mt-1 text-sm text-gray-900"><%= format_date(@session.date) %></dd>
+                  <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Session Date</dt>
+                  <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100"><%= format_date(@session.date) %></dd>
                 </div>
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Time</dt>
-                  <dd class="mt-1 text-sm text-gray-900">
+                  <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Time</dt>
+                  <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100">
                     <%= format_time(@session.start_time) %> - <%= format_time(@session.end_time) %>
                   </dd>
                 </div>
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Skill Level</dt>
-                  <dd class="mt-1 text-sm text-gray-900"><%= skill_level_text(@session) %></dd>
+                  <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Skill Level</dt>
+                  <dd class="mt-1 text-sm text-neutral-900 dark:text-neutral-100"><%= skill_level_text(@session) %></dd>
                 </div>
                 <div>
-                  <dt class="text-sm font-medium text-gray-500">Your Status</dt>
+                  <dt class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Your Status</dt>
                   <dd class="mt-1">
                     <span class={[
                       "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
                       if(@registration.status == :confirmed, 
-                        do: "bg-green-100 text-green-800", 
-                        else: "bg-yellow-100 text-yellow-800")
+                        do: "bg-success-100 text-success-800 dark:bg-success-900/30 dark:text-success-400", 
+                        else: "bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-400")
                     ]}>
                       <%= String.capitalize(to_string(@registration.status)) %>
                     </span>
@@ -241,16 +241,16 @@ defmodule SideoutWeb.CancellationLive do
 
             <!-- Deadline Warning -->
             <%= if @deadline_passed do %>
-              <div class="mt-6 rounded-md bg-yellow-50 p-4">
+              <div class="mt-6 rounded-md bg-warning-50 dark:bg-warning-900/30 p-4">
                 <div class="flex">
                   <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <svg class="h-5 w-5 text-warning-400" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <h3 class="text-sm font-medium text-yellow-800">Late Cancellation</h3>
-                    <p class="mt-1 text-sm text-yellow-700">
+                    <h3 class="text-sm font-medium text-warning-800 dark:text-warning-400">Late Cancellation</h3>
+                    <p class="mt-1 text-sm text-warning-700 dark:text-warning-300">
                       The cancellation deadline was <%= format_datetime(cancellation_deadline_datetime(@session)) %>. 
                       You can still cancel, but please be mindful of deadlines in the future.
                     </p>
@@ -262,8 +262,8 @@ defmodule SideoutWeb.CancellationLive do
             <!-- Cancellation Form -->
             <form phx-submit="cancel_registration" class="mt-6">
               <div>
-                <label for="reason" class="block text-sm font-medium text-gray-700">
-                  Reason for Cancellation <span class="text-gray-400">(optional)</span>
+                <label for="reason" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  Reason for Cancellation <span class="text-neutral-400">(optional)</span>
                 </label>
                 <textarea
                   id="reason"
@@ -271,7 +271,7 @@ defmodule SideoutWeb.CancellationLive do
                   rows="3"
                   phx-change="update_reason"
                   value={@cancellation_reason}
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  class="mt-1 block w-full rounded-md border-neutral-300 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-neutral-900 dark:text-neutral-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                   placeholder="Let us know why you're cancelling..."
                 ></textarea>
               </div>
@@ -280,11 +280,11 @@ defmodule SideoutWeb.CancellationLive do
                 <button
                   type="submit"
                   disabled={@cancelling}
-                  class="w-full rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="w-full rounded-md bg-danger-600 dark:bg-danger-500 px-3 py-2 text-sm font-semibold text-white shadow-sporty hover:bg-danger-500 dark:hover:bg-danger-400 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <%= if @cancelling, do: "Cancelling...", else: "Cancel Registration" %>
                 </button>
-                <p class="mt-4 text-center text-sm text-gray-600">
+                <p class="mt-4 text-center text-sm text-neutral-600 dark:text-neutral-400">
                   Changed your mind? Just close this page to keep your registration.
                 </p>
               </div>
